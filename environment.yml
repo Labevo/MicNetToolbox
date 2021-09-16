@@ -1,0 +1,33 @@
+name: MicNet-env
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  - bokeh==2.2.2
+  - dask
+  - h5py
+  - hdf5
+  - hdbscan
+  - matplotlib-base
+  - numba
+  - pandas
+  - pip 
+  - pylint
+  - python=3.8
+  - scipy
+  - spacy
+  - graph-tool
+  - hdbscan
+  
+  - pip:
+    - pyarrow
+    - streamlit == 0.88.0
+    - pytest
+    - networkx
+    - ipython
+    - umap-learn
+    - scikit-bio
+    - python-louvain
+    
