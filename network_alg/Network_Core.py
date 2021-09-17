@@ -2,6 +2,8 @@
 Mar 2021
 @author: Natalia
 """
+
+from os import error
 import networkx as nx
 from networkx.generators.directed import scale_free_graph
 import pandas as pd
@@ -10,7 +12,7 @@ import matplotlib.pyplot as plt
 import community  
 from random import sample 
 from itertools import zip_longest
-from typing import Union,Dict
+from typing import Optional, Union,Dict
 
 
 def get_weight(graph:nx.Graph):
@@ -39,7 +41,7 @@ class NetWork_MicNet:
         return self
 
     
-    def get_basic_statistics(self,graph:nx.Graph)->Dict[str,float]:
+    def get_basic_statistics(self)->Dict[str,float]:
 
         #self.basic_statistics(graph)
         return {'Nodes':self.nodes,
@@ -181,9 +183,186 @@ class NetWork_MicNet:
 
         data_dict['Small-world index']=(self.small_world_index(graph))
 
-        data_dict['Scale-free index']=scale_free_graph(graph)
+        data_dict['Scale-free index']=self.scale_free_index(graph)
         
         return data_dict
+
+    @staticmethod    
+    def structural_balance(graph:nx.Graph):
+        '''
+        Takes the raw correaltions obtained from sparCC (without normalization)
+        Returns the percentage of balanced and unbalanced relationships
+        And the percentage of each type of triangle
+        '''
+        #Build netowrk with relationships as 1 or -1
+        
+        edges = nx.get_edge_attributes(graph, 'weight')
+        Gn = nx.Graph()
+        for kv in edges.items():
+            if kv[1] > 0:
+                r = 1
+            elif kv[1]<0:
+                r = -1
+            Gn.add_edges_from([kv[0]],relationship = r)
+        #Find all triangles in network
+        triangles = [c for c in nx.cycle_basis(Gn) if len(c)==3]
+    
+        #Classifiy triangles
+        balanced1 = 0
+        balanced2 = 0
+        unbalanced1 =0 
+        unbalanced2 = 0
+
+        for triangle in triangles:
+            #Get subgraph of triangle
+            tri=nx.subgraph(Gn,triangle)
+            data =  nx.get_edge_attributes(tri, 'relationship')
+            rel = list(data.values())
+            #Take the product of the relationships
+            prod = rel[0]+rel[1]+rel[2]
+            if prod == 3:
+                balanced1+=1
+            elif prod == -1:
+                balanced2+=1
+            elif prod == 1:
+                unbalanced1+=1
+            elif prod == -3:
+                unbalanced2+=1
+            
+        D=len(triangles)
+        baltotal = (balanced1 + balanced2)/D
+        unbaltotal = (unbalanced1 + unbalanced2)/D
+        bal_1 = balanced1/D
+        bal_2 = balanced2/D
+        unbal_1 = unbalanced1/D
+        unbal_2 = unbalanced2/D
+
+        data_dict = {
+                'Percentage balanced': baltotal,
+                'Percentage unbalanced': unbaltotal,
+                'Triangles +++': bal_1,
+                'Triangles --+': bal_2,
+                'Triangles ++-': unbal_1,
+                'Triangles ---':unbal_2}
+
+        return data_dict
+
+    @staticmethod    
+    def key_otus(graph:nx.Graph,taxa:Union[pd.DataFrame,pd.Series]=None):
+        '''
+        Parameters
+        ----------
+        G : netowrk x graph
+        taxa : dataframe with ASV and/or taxa
+        n: number of top n nodes to return, default is 10
+        'all' then returns all centraility values
+        Returns
+        -------
+        key_otus: dictionary with dataframes, where each dataframe has the ASV, 
+        taxa and centrality metric of the top 10 OTUS
+        '''
+        #Calculating centralities
+        dcent = nx.degree_centrality(graph)
+        #dcent = dict(sorted(dcent.items(), key=lambda item: item[1], reverse=True))
+        bcent = nx.betweenness_centrality(graph)
+        #bcent = dict(sorted(bcent.items(), key=lambda item: item[1], reverse=True))
+        ccent = nx.closeness_centrality(graph)
+        #ccent = dict(sorted(ccent.items(), key=lambda item: item[1], reverse=True))
+        pRank = nx.pagerank(graph)
+        #pRank = dict(sorted(pRank.items(), key=lambda item: item[1], reverse=True))
+    
+        #cent_metrics = [dcent, bcent, ccent, pRank]
+    
+        #col_name = ['Degree centrality', 'Betweeness centrality', 'Closeness centrality', 'PageRank']
+    
+        # if n == 'all':
+        #     n = len(dcent)
+    
+        data_dict = {}
+        if type(taxa)!='NoneType':
+            data_dict['NUM_OTUS']=list(dcent.keys())
+            data_dict['TAXA']=list(taxa.values)
+            data_dict['Degree centrality']=list(dcent.values())
+            data_dict['Betweeness centrality']=list(bcent.values())
+            data_dict['Closeness centrality']=list(ccent.values())
+            data_dict['PageRank']=list(pRank.values())
+
+
+
+            # for num, data in enumerate(cent_metrics):
+            #     vals = list(data.values())[:n]
+            #     ind = list(data.keys())[:n]
+            #     taxam = taxa.loc[ind]
+            #     taxam[col_name[num]] = vals
+            #     data_dict[col_name[num]] = taxam
+            return data_dict
+
+        else:
+            data_dict['NUM_OTUS']=list(dcent.keys())
+            data_dict['Degree centrality']=list(dcent.values())
+            data_dict['Betweeness centrality']=list(bcent.values())
+            data_dict['Closeness centrality']=list(ccent.values())
+            data_dict['PageRank']=list(pRank.values())
+
+            # for num, data in enumerate(cent_metrics):
+            #     vals = list(data.values())[:n]
+            #     ind = list(data.keys())[:n]
+            #     taxam = taxa.loc[ind]
+            #     taxam[col_name[num]] = vals
+            #     data_dict[col_name[num]] = taxam
+            return data_dict
+
+    @staticmethod
+    def community_analysis(graph:nx.Graph,taxa:Union[pd.DataFrame,pd.Series]=None):
+        '''
+            Parameters
+            ----------
+            G : graph built with build_network or nx function
+            taxa: dataFrame with ASV and/or  taxa
+
+            Returns
+            -------
+            num_com = number of communities
+            df = Community with taxa id
+            com_dict = Communities topology
+
+            '''
+        try:
+            com = community.best_partition(graph)
+        except:
+            raise Exception("Bad graph type, use only non directed graph")
+
+
+        if type(taxa) != 'NoneType':
+            taxa['Community_id'] = com.values()    
+        else:
+            taxa=pd.DataFrame()
+            taxa['Community_id'] = com.values()
+
+        n_com = len(set(com.values()))
+        data = []
+        #Subnetwork analysis
+        for com_id in range(0,n_com):
+            subnet = [key  for (key, value) in com.items() if value == com_id]
+            Gc=nx.subgraph(graph,subnet)
+            data.append([Gc.number_of_nodes(),nx.diameter(Gc),nx.average_clustering(Gc),nx.average_shortest_path_length(Gc)])
+        
+        #transpose data
+        datat =[list(i) for i in zip(*data)]
+    
+        com_df = pd.DataFrame(
+                datat, 
+                index = ['Nodes', 'Diameter','Clustering coef', 'Average shortest path'],
+                columns = [f'Community_{i}' for i in range(0,n_com)]
+                )
+
+        data_dict = {
+                'Number of communities':n_com,
+                'Community_data': taxa,
+                'Communities_topology': com_df,
+                }
+        return data_dict
+
 
 
     @staticmethod
