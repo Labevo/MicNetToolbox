@@ -109,12 +109,12 @@ class NetWork_MicNet:
         self.description['average_clustering']=nx.average_clustering(graph)
         self.description['average_shortest_path_length']=nx.average_shortest_path_length(graph)
         self.description['modularity']=mod
-        self.description['small_world_index']=small_world_index(graph,
-                                                                n=self.description['nodes'],
-                                                                p=self.description['density'],
-                                                                cc=self.description['average_clustering'],
-                                                                l=self.description['average_shortest_path_length']
-                                                                )
+        # self.description['small_world_index']=small_world_index(graph,
+        #                                                         n=self.description['nodes'],
+        #                                                         p=self.description['density'],
+        #                                                         cc=self.description['average_clustering'],
+        #                                                         l=self.description['average_shortest_path_length']
+        #                                                         )
 
     def get_description(self)->Dict[str,Union[int,float]]:
 
@@ -134,7 +134,7 @@ class NetWork_MicNet:
         'Clustering coefficient':self.description['average_clustering'],
         'Shortest average path length': self.description['average_shortest_path_length'],
         'Modularity': self.description['modularity'],
-        'Small-world index': self.description['small_world_index']
+        # 'Small-world index': self.description['small_world_index']
         }
     
         return data_dict
@@ -411,56 +411,6 @@ class NetWork_MicNet:
          }
     
         return data_dict
-
-    # def community_analysis(graph:nx.Graph,taxa:Union[pd.DataFrame,pd.Series]=None):
-    #     '''
-    #         Parameters
-    #         ----------
-    #         G : graph built with build_network or nx function
-    #         taxa: dataFrame with ASV and/or  taxa
-
-    #         Returns
-    #         -------
-    #         num_com = number of communities
-    #         df = Community with taxa id
-    #         com_dict = Communities topology
-
-    #         '''
-    #     try:
-    #         com = community.best_partition(graph)
-    #     except:
-    #         raise Exception("Bad graph type, use only non directed graph")
-
-
-    #     if type(taxa) != 'NoneType':
-    #         taxa['Community_id'] = com.values()    
-    #     else:
-    #         taxa=pd.DataFrame()
-    #         taxa['Community_id'] = com.values()
-
-    #     n_com = len(set(com.values()))
-    #     data = []
-    #     #Subnetwork analysis
-    #     for com_id in range(0,n_com):
-    #         subnet = [key  for (key, value) in com.items() if value == com_id]
-    #         Gc=nx.subgraph(graph,subnet)
-    #         data.append([Gc.number_of_nodes(),nx.diameter(Gc),nx.average_clustering(Gc),nx.average_shortest_path_length(Gc)])
-        
-    #     #transpose data
-    #     datat =[list(i) for i in zip(*data)]
-    
-    #     com_df = pd.DataFrame(
-    #             datat, 
-    #             index = ['Nodes', 'Diameter','Clustering coef', 'Average shortest path'],
-    #             columns = [f'Community_{i}' for i in range(0,n_com)]
-    #             )
-
-    #     data_dict = {
-    #             'Number of communities':n_com,
-    #             'Community_data': taxa,
-    #             'Communities_topology': com_df,
-    #             }
-    #     return data_dict
 
 
     def __repr__(self) -> str:
