@@ -7,6 +7,7 @@ from .relationships import single_node_relationships
 from .relationships import taxa_relationships
 from .utils import create_normalize_graph
 from .plots import plot_matplotlib
+from .plots import plot_bokeh
 
 __all__=['NetWork_MicNet',
          'topology_boostrap',
@@ -16,4 +17,5 @@ __all__=['NetWork_MicNet',
          'single_node_relationships',
          'taxa_relationships',
          'create_normalize_graph',
-         'plot_matplotlib']
+         'plot_matplotlib',
+         'plot_bokeh']

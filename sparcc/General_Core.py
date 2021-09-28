@@ -10,6 +10,8 @@ from __future__ import unicode_literals
 
 import shutil
 
+from google.protobuf.descriptor import Error
+
 
 from sparcc.core.SparCC import main_alg
 from sparcc.core.io_methods import read_txt
@@ -150,6 +152,9 @@ class SparCC_MicNet:
         clean_previous_file('temp_sample_output.csv')
         clean_previous_file(self.outfile_pvals)
 
+        data_input=self._validation_format(data_input)
+        data_input=self._filter_otus(data_input)
+
         self.compute(data_input,save_corr_file)
         self.bootstrapping(data_input='')
         file_pvals=str(self.outpath)+str(self.perm_template)
@@ -212,6 +217,25 @@ class SparCC_MicNet:
             self.path_cov_file=os.path.join(str(self.savedir),'cov_files')
             os.makedirs(self.path_cov_file)
 
+    def _validation_format(self,frame:pd.DataFrame)->pd.DataFrame:
+                
+        #OTUS Values
+        if all((frame.iloc[:,0:].dtypes!='object').values):
+            values_df=frame.iloc[:,0:].values.copy()
+        else:
+            raise ValueError('There is something wrong with the OTUS values')
+
+        
+        DF_out=pd.DataFrame(index=frame.index,data=values_df)
+        return DF_out
+    
+    def _filter_otus(self,frame:pd.DataFrame)->pd.DataFrame:
+        
+
+        frame=frame.loc[(frame!=0).sum(axis=1)>=2,:].copy()
+        self._Index_col=frame.index
+
+        return frame
 
 
 

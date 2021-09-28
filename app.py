@@ -8,6 +8,7 @@ from pathlib import Path
 import hashlib
 from PIL import Image
 from bokeh.models.annotations import Label
+from bokeh.models.layouts import Column
 from bokeh.models.widgets import tables
 from networkx.classes import graph
 from networkx.classes.graph import Graph
@@ -30,6 +31,7 @@ from network_alg.utils import create_normalize_graph
 from network_alg import NetWork_MicNet
 from network_alg import HDBSCAN_subnetwork 
 from network_alg import plot_matplotlib
+from network_alg import plot_bokeh
 
 
 #CONTS
@@ -105,6 +107,7 @@ def sparcc_app():
     st.sidebar.title("P - Valores")
     num_simulate_data=st.sidebar.slider(label="Num de simulaciones",min_value=5,max_value=100,step=5,value=5)
     type_pvalues=st.sidebar.text_input(label="tipo de pvals",value="one_sided")
+    remove_taxa=st.sidebar.text_input(label='Columna a remover',value='Taxa')
 
         
     B=st.sidebar.button(label='Estimacion')
@@ -130,8 +133,12 @@ def sparcc_app():
                 dataframe = pd.read_table(file_input,index_col=0)
             else:
                 dataframe = pd.read_csv(file_input,index_col=0)
+        
             st.text("Muestra de Datos")
             st.dataframe(dataframe.head())
+        
+            if remove_taxa!=None:
+                dataframe=dataframe.drop(columns=[remove_taxa])
         
             SparCC_MN.run_all(data_input=dataframe)
             st.info("Termino la estimacion de las correlaciones")
@@ -139,16 +146,18 @@ def sparcc_app():
         DF_SparCC=pd.read_csv(Path(SparCC_MN.save_corr_file).resolve(),index_col=0)
         DF_PValues=pd.read_csv(Path(SparCC_MN.outfile_pvals).resolve(),index_col=0)
 
+        
+
 
         assert DF_SparCC.shape==DF_PValues.shape , "Error with SparCC Output and Pvalues"
 
         DF_Output=DF_SparCC[DF_PValues<0.05]
-            
         del DF_SparCC,DF_PValues
 
+        DF_Output.index=SparCC_MN._Index_col
+        DF_Output.columns=SparCC_MN._Index_col
+
         csv = convert_df(DF_Output)
-
-
 
         st.download_button(label="Descargar las Correlaciones",
                                data=csv,
@@ -291,22 +300,26 @@ def network_app():
     layout_kind=st.sidebar.selectbox(label='Layout for Plot',options=['Circular','Spring'],
                              help='Para mayor infomacion revisa layout in networkx')
 
+    # KindP=st.sidebar.selectbox(label='Color de los Nodos',options=['HDBSCAN','Comunidades'])
     B=st.sidebar.button(label='Estimacion')
 
 
     if file_input is not None and B==True:
-        sparcc_corr = pd.read_csv(file_input,index_col=0)
+        sparcc_corr = pd.read_csv(file_input,header=0,index_col=0).fillna(0)
+        
+        #sparcc_corr=sparcc_corr.drop(columns=[0])
+
         MAX=sparcc_corr.max().max()
         MIN=sparcc_corr.min().min()
         SHAPE=sparcc_corr.shape
 
-    
         if int(SHAPE[1])!=int(SHAPE[0]):
-            raise EOFError('Error')
             st.error('Error')
-            st.stop()
+            raise EOFError('Error')
+
         
         #Graph Process
+
         M=_build_network(sparcc_corr)
         Mnorm=create_normalize_graph(sparcc_corr)
 
@@ -314,7 +327,7 @@ def network_app():
         
         st.markdown("### Informacion General de la Red")
         with st.spinner("En progreso"):
-            NetM.basic_description(M)
+            NetM.basic_description(corr=sparcc_corr)
         table1=pd.Series(NetM.get_description()).to_frame(name='Informacion Basica de la Red')
         st.table(table1)
         st.markdown('---')
@@ -333,7 +346,7 @@ def network_app():
         
         st.write(f'Numero de Comunidades: {Comunidades["Number of communities"]}')
         st.table(Comunidades["Communities_topology"].T)
-
+        st.markdown('---')
         st.markdown("### Plot")
 
         Centrality=NetM.key_otus(Mnorm)
@@ -354,36 +367,37 @@ def network_app():
                       'HDBSCAN':HD[2],
                       'Community':Comunidades['Community_data'].values.ravel()})
 
+        if M.number_of_nodes()>500:
+            fig1=plot_matplotlib(graph=M,frame=SparrDF,
+                           max=MAX,
+                           min=MIN,
+                           kind_network=str(layout_kind).lower())
+            st.text('Outliers en Rojo')
+            fig2=plot_matplotlib(graph=M,frame=SparrDF,
+                           max=MAX,
+                           min=MIN,
+                           kind_network=str(layout_kind).lower(),
+                           kind='Comunidades')
+            st.pyplot(fig=fig1)
+            st.pyplot(fig=fig2)
+            
+        else:
+            
+            fig3=plot_bokeh(graph=M,frame=SparrDF,
+                           max=MAX,
+                           min=MIN,
+                           kind_network=str(layout_kind).lower(),
+                           kind='HDBSCAN')
+            st.text('Outliers tiene Numero -1 en la informacion de Comunidad')
 
-        
-        fig=plot_matplotlib(graph=M,frame=SparrDF,max=MAX,min=MIN,kind_network=str(layout_kind).lower())
+            fig4=plot_bokeh(graph=M,frame=SparrDF,
+                           max=MAX,
+                           min=MIN,
+                           kind_network=str(layout_kind).lower(),
+                           kind='Community')
 
-        st.pyplot(fig=fig)
-
-
-
-
-
-
-
-
-
-
-         
-
-
-
-
-
-
-
-        
-
-
-
-
-
-
+            st.bokeh_chart(fig3)
+            st.bokeh_chart(fig4)
 
 
 def core_app():
@@ -425,8 +439,6 @@ def main():
             st.error("the password you entered is incorrect")
     else:
         core_app()
-
-
 
 
 if __name__ == "__main__":

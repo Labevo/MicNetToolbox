@@ -3,7 +3,8 @@ Mar 2021
 @author: Natalia
 """
 import networkx as nx
-from .utils import _normalize_corr,_build_network
+from networkx.classes import graph
+from .utils import _normalize_corr,_build_network, create_normalize_graph
 from networkx.algorithms import community as nx_comm
 import pandas as pd
 import numpy as np 
@@ -22,7 +23,7 @@ def small_world_index(G:nx.Graph,
                       p:float=0.0,
                       cc:float=0.0,
                       l:float=0.0,
-                      n_iter:int = 50)->float:
+                      n_iter:int = 20)->float:
     '''
     Returns small-world index calcualted as proposed by Humphries & Gurney, 2008.
     
@@ -85,9 +86,17 @@ class NetWork_MicNet:
         self.groups=groups
 
 
-    def basic_description(self,graph:nx.Graph)->None:
+    def basic_description(self,corr:Union[np.ndarray,pd.DataFrame])->None:
 
         self.description={}
+        #TODO Mnomr
+        if type(corr)==pd.DataFrame:
+            corr=corr.values.copy()
+        
+        graph=_build_network(corr)
+        wgh=get_weight(graph)
+        del graph
+        graph = create_normalize_graph(corr)
 
         #Calculate modularity
         try: 
@@ -95,13 +104,14 @@ class NetWork_MicNet:
         except ZeroDivisionError:
             mod = 'nan'
 
+        #Description
 
-        wgh=get_weight(graph)
         self.description['nodes']=graph.number_of_nodes()
         self.description['total_interactions']=sum(wgh>0)+sum(wgh<0)
         self.description['posInt'] = sum(wgh>0)
         self.description['negInt'] = sum(wgh<0)
-        self.description['pos_neg_ratio']=self.description['posInt']/self.description['negInt']
+        self.description['pos_neg_ratio']=self.description['posInt']/self.description['negInt'] if \
+            self.description['negInt']!=0 else 0.0
         self.description['density']=nx.density(graph)        
         self.description['average_degree']=np.mean([graph.degree(n) for n in graph.nodes()])
         self.description['degree_std']=np.std([graph.degree(n) for n in graph.nodes()])
@@ -109,12 +119,12 @@ class NetWork_MicNet:
         self.description['average_clustering']=nx.average_clustering(graph)
         self.description['average_shortest_path_length']=nx.average_shortest_path_length(graph)
         self.description['modularity']=mod
-        # self.description['small_world_index']=small_world_index(graph,
-        #                                                         n=self.description['nodes'],
-        #                                                         p=self.description['density'],
-        #                                                         cc=self.description['average_clustering'],
-        #                                                         l=self.description['average_shortest_path_length']
-        #                                                         )
+        self.description['small_world_index']=small_world_index(graph,
+                                                                n=self.description['nodes'],
+                                                                p=self.description['density'],
+                                                                cc=self.description['average_clustering'],
+                                                                l=self.description['average_shortest_path_length']
+                                                                )
 
     def get_description(self)->Dict[str,Union[int,float]]:
 
@@ -134,7 +144,7 @@ class NetWork_MicNet:
         'Clustering coefficient':self.description['average_clustering'],
         'Shortest average path length': self.description['average_shortest_path_length'],
         'Modularity': self.description['modularity'],
-        # 'Small-world index': self.description['small_world_index']
+         'Small-world index': self.description['small_world_index']
         }
     
         return data_dict
@@ -262,10 +272,14 @@ class NetWork_MicNet:
         edges = nx.get_edge_attributes(graph, 'weight')
         Gn = nx.Graph()
         for kv in edges.items():
-            if kv[1] > 0:
+            if kv[1] >= 0:
                 r = 1
             elif kv[1]<0:
                 r = -1
+            else:
+                print(f'Problem {kv[1]}')
+                r=1
+
             Gn.add_edges_from([kv[0]],relationship = r)
         #Find all triangles in network
         triangles = [c for c in nx.cycle_basis(Gn) if len(c)==3]
@@ -329,7 +343,10 @@ class NetWork_MicNet:
         dcent = nx.degree_centrality(graph)
         bcent = nx.betweenness_centrality(graph)
         ccent = nx.closeness_centrality(graph)
-        pRank = nx.pagerank(graph)
+        try:
+            pRank = nx.pagerank(graph)
+        except:
+            pRank={k:0 for k in dcent.keys()}
     
         data_dict = {}
         if taxa or type(taxa)==pd.DataFrame:
