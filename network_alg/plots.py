@@ -185,15 +185,3 @@ def plot_bokeh(graph:nx.Graph,frame:pd.DataFrame,
     plot.add_tools(node_hover_tool)
 
     return plot
-
-
-
-
-
-
-
-
-
-
-
-

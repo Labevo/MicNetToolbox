@@ -65,6 +65,15 @@ conda activate  MicNet-env
 ~~~
 
 ## Local use
+If you want to use it locally, it must be inside the MicNetTools folder and run the following code:
+~~~bash
+
+streamlit run app.py
+
+~~~
+The application will open in your browser at the port: http://localhost:8501 
+
+**Note: note: remember to activate the MicNet-env environment first**
 
 ## Data Details
 
