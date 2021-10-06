@@ -86,7 +86,7 @@ def menu_app():
             [Inferring Correlation Networks from Genomic Survey Data](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002687)
         
         * Networks:
-            Large-scale metrics and communities from the network, this uses as input the Sparcc output.
+            Large-scale metrics, structural balance and community information can be calculated for the network, this section uses as input the Sparcc output.
 
         """)
 
@@ -104,7 +104,7 @@ def sparcc_app():
     normalization=st.sidebar.selectbox(label="Normalization type",options=['dirichlet','normalization'])
     log_transform=st.sidebar.selectbox(label="Log Transformation",options=[True,False])
     With_Covarianza=st.sidebar.selectbox(label="Covariance file",options=[False,True])
-    st.sidebar.title("P - Valores")
+    st.sidebar.title("P - Values")
     num_simulate_data=st.sidebar.slider(label="Number of simulations",min_value=5,max_value=100,step=5,value=5)
     type_pvalues=st.sidebar.text_input(label="P-value type",value="one_sided")
     remove_taxa=st.sidebar.text_input(label='Column to remove',value='Taxa')
@@ -188,7 +188,7 @@ def dashboar_app():
                                        value=2,help='Check UMAP documentation')
     metric_umap=st.sidebar.selectbox('Select metric',options=METRIC,index=7,
                                         help='Check UMAP documentation')
-    taxa=st.sidebar.selectbox('Includes Taxa',options=[True, False],index=1,
+    taxa=st.sidebar.selectbox('Include Taxa',options=[True, False],index=1,
                                 help='Does your file includes a column indicating taxa?')
     st.sidebar.markdown('---')
     st.sidebar.header('HDBSCAN parameters')
@@ -293,7 +293,7 @@ def dashboar_app():
                 cluster belonging and outlier information')
 
 def network_app():
-    st.title('NetWork analysis') 
+    st.title('Network analysis') 
     file_input=st.sidebar.file_uploader(label='Upload SparCC output file',type=['csv'],
     help="If you don't have this file, please calculate it at SparCC section")
 
@@ -404,9 +404,9 @@ def core_app():
 
     st.image(imagen_ixulabs,caption='Laboratorio de Evolución Molecular y Experimental',width=200)
 
-    b1=st.sidebar.selectbox('Opciones',OPTIONS)
+    b1=st.sidebar.selectbox('Options',OPTIONS)
     
-    if b1=='Menú':
+    if b1=='Menu':
         menu_app()
 
     elif b1=='UMAP/HDBSCAN':
