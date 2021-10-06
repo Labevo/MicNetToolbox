@@ -37,7 +37,7 @@ from network_alg import plot_bokeh
 #CONTS
 key='1e629b5c8f2e7fff85ed133a8713d545678bd44badac98200cbd156d'
 
-NORMALIZATION=['ninguna','clr','estandar','dirichlet']
+NORMALIZATION=['none','clr','standar','dirichlet']
 METRIC=['euclidean','manhattan','canberra','braycurtis','mahalanobis',
 'cosine','correlation','hellinger']
 METRIC_HDB=['euclidean','manhattan','canberra','braycurtis','mahalanobis']
@@ -45,7 +45,7 @@ METRIC_HDB=['euclidean','manhattan','canberra','braycurtis','mahalanobis']
 
 
 PATH_IMAG=Path('images')
-OPTIONS=['Menú','Dashboard','SparCC','Network']
+OPTIONS=['Menu','UMAP/HDBSCAN','SparCC','Network']
 
 image_path=PATH_IMAG.resolve()/'logo_ie.png'
 imagen_ixulabs=Image.open(image_path)
@@ -65,52 +65,52 @@ def menu_app():
     st.sidebar.markdown("""
     ### Refencias
      * [:link: UMAP](https://umap-learn.readthedocs.io/en/latest/)
-     * [:link: Detección de Outliers con HDBSCAN](https://hdbscan.readthedocs.io/en/latest/outlier_detection.html)
+     * [:link: Outlier description with HDBSCAN](https://hdbscan.readthedocs.io/en/latest/outlier_detection.html)
      * [:link: SparCC](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002687)
      * [:link: NetworkX](https://networkx.org/)
     """)
 
     st.markdown("---")
-    st.header("Menú General")
+    st.header("General Menu")
     st.markdown("""
-        ### La aplicación tiene 3 componentes
+        ### The application has three main components:
         
 
 
-        * Dashboard :
-            Exploracion del comportamiento de los datos proporcionados via UMAP.
+        * UMAP/HDBSCAN :
+            Exploration of the data with UMAP and clustering algorithm HDBSCAN.
             
         * SparCC:
-            Se puede ejecutar el algoritmo para detectar las correlaciones. Para revisar detalles se recomiendo el siguiente artículo:
+            Algorithm that can be run to estimate correlations from abundance data. For a more detail explanation the following paper is recommended:
                 
             [Inferring Correlation Networks from Genomic Survey Data](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002687)
         
         * Networks:
-            Calculos estandar sobre la red que se puede construir mediante las salidas de SparCC.
+            Large-scale metrics and communities from the network, this uses as input the Sparcc output.
 
         """)
 
 
 def sparcc_app():
-    st.sidebar.title("Parámetros Correlacion")
-    st.sidebar.header("Archivo")
-    file_input=st.sidebar.file_uploader("Carga el Archivo",type=["csv","txt"])
-    st.sidebar.header("Número de Inferencias")
+    st.sidebar.title("Correlation parameters")
+    st.sidebar.header("File")
+    file_input=st.sidebar.file_uploader("Upload file",type=["csv","txt"])
+    st.sidebar.header("Number of inferences")
     n_iteractions=st.sidebar.slider(label='n_iter',min_value=2,max_value=50,step=1,value=20)
-    st.sidebar.header("Número de exclusiones")
+    st.sidebar.header("Number of exclusions")
     x_iteractions=st.sidebar.slider(label='x_iter',min_value=2,max_value=30,step=1,value=10)
-    st.sidebar.header("Umbral de Exclusión")
+    st.sidebar.header("Exclusion threshold")
     threshold=st.sidebar.slider(label='th',min_value=0.1,max_value=0.9,step=0.05,value=0.1)
-    normalization=st.sidebar.selectbox(label="Tipo de Normalizacion",options=['dirichlet','normalizacion'])
+    normalization=st.sidebar.selectbox(label="Normalization type",options=['dirichlet','normalization'])
     log_transform=st.sidebar.selectbox(label="Log Transformation",options=[True,False])
-    With_Covarianza=st.sidebar.selectbox(label="Con archivo de Covarianza",options=[False,True])
+    With_Covarianza=st.sidebar.selectbox(label="Covariance file",options=[False,True])
     st.sidebar.title("P - Valores")
-    num_simulate_data=st.sidebar.slider(label="Num de simulaciones",min_value=5,max_value=100,step=5,value=5)
-    type_pvalues=st.sidebar.text_input(label="tipo de pvals",value="one_sided")
-    remove_taxa=st.sidebar.text_input(label='Columna a remover',value='Taxa')
+    num_simulate_data=st.sidebar.slider(label="Number of simulations",min_value=5,max_value=100,step=5,value=5)
+    type_pvalues=st.sidebar.text_input(label="P-value type",value="one_sided")
+    remove_taxa=st.sidebar.text_input(label='Column to remove',value='Taxa')
 
         
-    B=st.sidebar.button(label='Estimacion')
+    B=st.sidebar.button(label='Run estimation')
     if file_input is not None and B==True:
         SparCC_MN=SparCC_MicNet(n_iteractions=n_iteractions,
                                     x_iteractions=x_iteractions,
@@ -128,20 +128,20 @@ def sparcc_app():
         st.write(SparCC_MN)
         st.write('-----')
 
-        with st.spinner("En progreso"):
+        with st.spinner("In progress"):
             if kind_file(file_input.name):
                 dataframe = pd.read_table(file_input,index_col=0)
             else:
                 dataframe = pd.read_csv(file_input,index_col=0)
         
-            st.text("Muestra de Datos")
+            st.text("Data sample")
             st.dataframe(dataframe.head())
         
             if remove_taxa!=None:
                 dataframe=dataframe.drop(columns=[remove_taxa])
         
             SparCC_MN.run_all(data_input=dataframe)
-            st.info("Termino la estimacion de las correlaciones")
+            st.info("Correlation estimation has finished")
 
         DF_SparCC=pd.read_csv(Path(SparCC_MN.save_corr_file).resolve(),index_col=0)
         DF_PValues=pd.read_csv(Path(SparCC_MN.outfile_pvals).resolve(),index_col=0)
@@ -159,9 +159,9 @@ def sparcc_app():
 
         csv = convert_df(DF_Output)
 
-        st.download_button(label="Descargar las Correlaciones",
+        st.download_button(label="Download correlation file",
                                data=csv,
-                               file_name='SparCC_Output.csv',help='Descarga el archivo')
+                               file_name='SparCC_Output.csv',help='Downloads the correlation file')
         #clean files
         clean_previous_file(SparCC_MN.save_corr_file)
         clean_previous_file(SparCC_MN.outfile_pvals)
@@ -169,37 +169,37 @@ def sparcc_app():
 
 
 def dashboar_app():
-    st.sidebar.header("Interactive Visualizer - 4 Ciénegas")
+    st.sidebar.header("Interactive Visualizer")
 
     #Parameters
-    type_normalization=st.sidebar.selectbox('Tipo de Normalizacion',NORMALIZATION,
-                                    help='Selecciona la que deseas aplicar, por default no se normalizan')
+    type_normalization=st.sidebar.selectbox('Normalization type',NORMALIZATION,
+                                    help='Select which one to apply, by default normalizations are not applied.')
         
-    file_input=st.sidebar.file_uploader(label='Archivo de Entrada',type=['txt','csv'],
-                                            help='Sube el archivo que deseas procesar')
+    file_input=st.sidebar.file_uploader(label='Input file',type=['txt','csv'],
+                                            help='Upload the file to process')
 
     st.sidebar.markdown('---')
-    st.sidebar.header('Parámetros de UMAP')
+    st.sidebar.header('UMAP parameters')
     n_neighbors=st.sidebar.slider(label='n_neighbors',min_value=5,max_value=50,step=1,
-                                      value=15,help='Revisa la documentacion de UMAP')
+                                      value=15,help='Check UMAP documentation')
     min_dist=st.sidebar.slider(label='min_dist',min_value=0.0,max_value=0.99,step=0.1,
-                                   value=0.1,help='Revisa la documentacion de UMAP')
+                                   value=0.1,help='Check UMAP documentation')
     n_components=st.sidebar.slider(label='n_components',min_value=2,max_value=3,step=1,
-                                       value=2,help='Revisa la documentacion de UMAP')
-    metric_umap=st.sidebar.selectbox('Selecciona una Métrica',options=METRIC,index=7,
-                                        help='Revisa la documentacion de UMAP para un mejor entendimiento')
-    taxa=st.sidebar.selectbox('Tiene Taxa',options=[True, False],index=1,
-                                help='Tiene datos taxonómico tus datos?')
+                                       value=2,help='Check UMAP documentation')
+    metric_umap=st.sidebar.selectbox('Select metric',options=METRIC,index=7,
+                                        help='Check UMAP documentation')
+    taxa=st.sidebar.selectbox('Includes Taxa',options=[True, False],index=1,
+                                help='Does your file includes a column indicating taxa?')
     st.sidebar.markdown('---')
-    st.sidebar.header('Parametros de HDBSCAN')
-    metric_hdb=st.sidebar.selectbox('Selecciona una Métrica',options=METRIC_HDB,index=3,
-                                        help='Revisa la documentacion de HDBSCAN para un mejor entendimiento')
+    st.sidebar.header('HDBSCAN parameters')
+    metric_hdb=st.sidebar.selectbox('Select metric',options=METRIC_HDB,index=3,
+                                        help='Check HDBSCAN documentation for more information')
     min_cluster_size=st.sidebar.slider(label='min_cluster_size',min_value=5,max_value=100,step=1,value=15,
-                                            help='Revisa la documentacion de HDBSCAN')
+                                            help='Check HDBSCAN documentation for more information')
     min_sample=st.sidebar.slider(label='min_sample',min_value=1,max_value=60,step=1,value=5,
-                                            help='Revisa la documentacion de HDBSCAN')
+                                            help='Check HDBSCAN documentation for more information')
 
-    B=st.sidebar.button(label='Estimacion')
+    B=st.sidebar.button(label='Run estimation')
 
     embedding_outliers=Embedding_Output(n_neighbors=n_neighbors,min_dist=min_dist,
         n_components=n_components,metric_umap=metric_umap,metric_hdb=metric_hdb,min_cluster_size=min_cluster_size,min_sample=min_sample,output=True)
@@ -213,7 +213,7 @@ def dashboar_app():
             dataframe = pd.read_csv(file_input)
 
             
-        st.info("Muestra de Archivo Cargado")
+        st.info("Data sample")
         st.dataframe(dataframe.head())
 
 
@@ -235,8 +235,8 @@ def dashboar_app():
             TOOLTIPS=[("Name", "@Name")]
     
 
-        with st.spinner("En progreso"):
-            st.info("Plot del Embedding")
+        with st.spinner("In progess"):
+            st.info("Embedding plot")
             embedding_,o,l=embedding_outliers.fit(X)
                 
     
@@ -260,7 +260,7 @@ def dashboar_app():
 
             S=ColumnDataSource(dataE)
                 
-            p = figure(title="Embedding de Otus", x_axis_label='x',y_axis_label='y',
+            p = figure(title="Embedding", x_axis_label='x',y_axis_label='y',
                         x_range=[-1,1],y_range=[-1,1],width=800, height=800,tools=TOOLS,tooltips=TOOLTIPS)
 
             p.circle(x=0.0,y=0.0,fill_alpha=0.1,line_color='black',size=20,radius=1,fill_color=None,line_width=2,muted=False)
@@ -270,11 +270,11 @@ def dashboar_app():
             st.bokeh_chart(figure=p)
             st.markdown("---")
             st.markdown(f"""
-            ## Descripcion
-               Se tiene un total de {len(disk_x)} registros en el archivo. Detalles:
+            ## Description:
+               There is a total of {len(disk_x)} registers in the file. Where we found:
                 
-                * Numero de clusters:  {len(set(l))}
-                * Numero de outliers:  {np.sum(o)}""")
+                * Number of clusters:  {len(set(l))}
+                * Number of outliers:  {np.sum(o)}""")
             
 
 
@@ -286,22 +286,22 @@ def dashboar_app():
         csv = convert_df(DF)
             
         st.download_button(
-                label="Descarga el archivo",
+                label="Download file",
                 data=csv,
                 file_name=name_file,
-                mime='text/csv',help='El archivo contiene informacion \
-                de los cluster y los otus detectados como outliers')
+                mime='text/csv',help='This file contains \
+                cluster belonging and outlier information')
 
 def network_app():
-    st.title('Análisis de la Red') 
-    file_input=st.sidebar.file_uploader(label='Carga el archivo de salida de SparCC',type=['csv'],
-    help='Si no se tiene el archivo, calcula lo en la seccion de SparCC')
+    st.title('NetWork analysis') 
+    file_input=st.sidebar.file_uploader(label='Upload SparCC output file',type=['csv'],
+    help="If you don't have this file, please calculate it at SparCC section")
 
-    layout_kind=st.sidebar.selectbox(label='Layout for Plot',options=['Circular','Spring'],
-                             help='Para mayor infomacion revisa layout in networkx')
+    layout_kind=st.sidebar.selectbox(label='Plot layout',options=['Circular','Spring'],
+                             help='For more information check layout in networkx')
 
     # KindP=st.sidebar.selectbox(label='Color de los Nodos',options=['HDBSCAN','Comunidades'])
-    B=st.sidebar.button(label='Estimacion')
+    B=st.sidebar.button(label='Run estimation')
 
 
     if file_input is not None and B==True:
@@ -325,26 +325,26 @@ def network_app():
 
         NetM=NetWork_MicNet()
         
-        st.markdown("### Informacion General de la Red")
-        with st.spinner("En progreso"):
+        st.markdown("### Large-scale metrics of network")
+        with st.spinner("In progess"):
             NetM.basic_description(corr=sparcc_corr)
-        table1=pd.Series(NetM.get_description()).to_frame(name='Informacion Basica de la Red')
+        table1=pd.Series(NetM.get_description()).to_frame(name='Basic network information')
         st.table(table1)
         st.markdown('---')
 
 
-        st.markdown("### Informacion General de la Estructura")
-        with st.spinner("En progreso"):
+        st.markdown("### Basic structural balance information")
+        with st.spinner("In progess"):
             t2nw=NetM.structural_balance(M)
         
-        table2=pd.Series(t2nw).to_frame(name='Balance de la Estructura')
+        table2=pd.Series(t2nw).to_frame(name='Structural balance')
         st.table(table2)
         st.markdown('---')
-        st.markdown("## Informacion General de las Comunidades")
-        with st.spinner("En progreso"):
+        st.markdown("## Communities information")
+        with st.spinner("In progess"):
             Comunidades=NetM.community_analysis(Mnorm)
         
-        st.write(f'Numero de Comunidades: {Comunidades["Number of communities"]}')
+        st.write(f'Number of communities: {Comunidades["Number of communities"]}')
         st.table(Comunidades["Communities_topology"].T)
         st.markdown('---')
         st.markdown("### Plot")
@@ -372,12 +372,12 @@ def network_app():
                            max=MAX,
                            min=MIN,
                            kind_network=str(layout_kind).lower())
-            st.text('Outliers en Rojo')
+            st.text('Outliers in red')
             fig2=plot_matplotlib(graph=M,frame=SparrDF,
                            max=MAX,
                            min=MIN,
                            kind_network=str(layout_kind).lower(),
-                           kind='Comunidades')
+                           kind='Communities')
             st.pyplot(fig=fig1)
             st.pyplot(fig=fig2)
             
@@ -388,7 +388,7 @@ def network_app():
                            min=MIN,
                            kind_network=str(layout_kind).lower(),
                            kind='HDBSCAN')
-            st.text('Outliers tiene Numero -1 en la informacion de Comunidad')
+            st.text('Outliers have a value of -1')
 
             fig4=plot_bokeh(graph=M,frame=SparrDF,
                            max=MAX,
@@ -409,7 +409,7 @@ def core_app():
     if b1=='Menú':
         menu_app()
 
-    elif b1=='Dashboard':
+    elif b1=='UMAP/HDBSCAN':
         dashboar_app()
     
     elif b1=='SparCC':
