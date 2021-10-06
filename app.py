@@ -63,7 +63,7 @@ def clean_previous_file(name_file:str)->None:
 
 def menu_app():
     st.sidebar.markdown("""
-    ### Refencias
+    ### References
      * [:link: UMAP](https://umap-learn.readthedocs.io/en/latest/)
      * [:link: Outlier description with HDBSCAN](https://hdbscan.readthedocs.io/en/latest/outlier_detection.html)
      * [:link: SparCC](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002687)
