@@ -62,14 +62,19 @@ def community_analysis(corr:Union[pd.DataFrame,np.ndarray],
     for com_id in range(0,n_com):
         subnet = [key  for (key, value) in com.items() if value == com_id]
         Gc=nx.subgraph(G,subnet)
-        data.append([Gc.number_of_nodes(),nx.diameter(Gc),nx.average_clustering(Gc),nx.average_shortest_path_length(Gc)])
+        data.append([Gc.number_of_nodes(),
+                     Gc.number_of_edges(),
+                     nx.density(Gc),
+                     np.mean([Gc.degree(n) for n in Gc.nodes()]),
+                     np.std([Gc.degree(n) for n in Gc.nodes()]),
+                     nx.average_clustering(Gc)])
     
     #transpose data
     datat =[list(i) for i in zip(*data)]
     
     com_df = pd.DataFrame(
         datat, 
-        index = ['Nodes', 'Diameter','Clustering coef', 'Average shortest path'],
+        index = ['Nodes', 'Edges','Density', 'Average degree','degree std', 'Clustering coefficient'],
         columns = [f'Community_{i}' for i in range(0,n_com)]
         )
 
