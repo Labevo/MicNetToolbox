@@ -380,20 +380,22 @@ def network_app():
                 mime='text/csv',help='This file contains \
                 centralities and community information for each node')
 
-
         if M.number_of_nodes()>500:
             fig1=plot_matplotlib(graph=M,frame=SparrDF,
                            max=MAX,
                            min=MIN,
-                           kind_network=str(layout_kind).lower())
+                           kind_network=str(layout_kind).lower(),
+                           kind='HDBSCAN')
             st.text('Outliers in red')
+
             fig2=plot_matplotlib(graph=M,frame=SparrDF,
                            max=MAX,
                            min=MIN,
                            kind_network=str(layout_kind).lower(),
                            kind='Communities')
-            st.pyplot(fig=fig1)
-            st.pyplot(fig=fig2)
+
+            st.pyplot(fig=fig1, transparent= True)
+            st.pyplot(fig=fig2, transparent= True)
             
         else:
             fig3=plot_bokeh(graph=M,frame=SparrDF,
