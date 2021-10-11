@@ -422,23 +422,24 @@ def core_app():
         
 
 def main():
-    session_state = get(password='')
-    pword=str(session_state.password)
+    core_app()
+    #session_state = get(password='')
+    #pword=str(session_state.password)
+    #
+    #if hashlib.sha224(pword.encode('UTF-8')).hexdigest()!=key:
+    #    pwd_placeholder = st.sidebar.empty()
+    #    pwd = pwd_placeholder.text_input("Password:", value="", type="password")
+    #    session_state.password = pwd
+    #    pword=str(session_state.password)
 
-    if hashlib.sha224(pword.encode('UTF-8')).hexdigest()!=key:
-        pwd_placeholder = st.sidebar.empty()
-        pwd = pwd_placeholder.text_input("Password:", value="", type="password")
-        session_state.password = pwd
-        pword=str(session_state.password)
 
-
-        if hashlib.sha224(pword.encode('UTF-8')).hexdigest()==key:
-            pwd_placeholder.empty()
-            core_app()
-        else:
-            st.error("the password you entered is incorrect")
-    else:
-        core_app()
+    #    if hashlib.sha224(pword.encode('UTF-8')).hexdigest()==key:
+    #        pwd_placeholder.empty()
+    #        core_app()
+    #    else:
+    #        st.error("the password you entered is incorrect")
+    #else:
+    #    core_app()
 
 
 if __name__ == "__main__":
