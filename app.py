@@ -367,6 +367,7 @@ def network_app():
                       'HDBSCAN':HD[2],
                       'Community':Comunidades['Community_data'].values.ravel()})
 
+
         if M.number_of_nodes()>500:
             fig1=plot_matplotlib(graph=M,frame=SparrDF,
                            max=MAX,
@@ -395,10 +396,21 @@ def network_app():
                            min=MIN,
                            kind_network=str(layout_kind).lower(),
                            kind='Community')
-
             st.bokeh_chart(fig3)
             st.bokeh_chart(fig4)
 
+        #Download centralities
+        name_file='Output_Centralities.csv'
+        DF=SparrDF
+        csv = convert_df(DF)
+            
+        st.download_button(
+                label="Download file",
+                data=csv,
+                file_name=name_file,
+                mime='text/csv',help='This file contains \
+                centralities information for each node')
+        
 
 def core_app():
 
