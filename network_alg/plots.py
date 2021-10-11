@@ -135,7 +135,7 @@ def plot_bokeh(graph:nx.Graph,frame:pd.DataFrame,
                   x_range=Range1d(-1.1,1.1), 
                   y_range=Range1d(-1.1,1.1),
                   tooltips =[("Name", "@index")],
-                  tools="pan,wheel_zoom,save,reset,box_zoom")
+                  tools="pan,wheel_zoom,save,reset,box_zoom", output_backend="svg")
 
     plot.title.text = f"Network - {kind}"
     plot.title.text_font_size = "30px"

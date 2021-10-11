@@ -22,7 +22,7 @@ from umap_hdbscan import Embedding_Output
 from sparcc import SparCC_MicNet
 from SessionState import get
 
-from bokeh.models import ColumnDataSource
+from bokeh.models import ColumnDataSource, Plot
 from bokeh.plotting import figure
 import streamlit as st
 import pandas as pd
@@ -259,8 +259,8 @@ def dashboar_app():
                 dataE=dict(x=disk_x.tolist(),y=disk_y.tolist(),Color=colors,Name=Text.iloc[:,0].tolist())
 
             S=ColumnDataSource(dataE)
-                
-            p = figure(title="Embedding", x_axis_label='x',y_axis_label='y',
+
+            p = figure(title="Embedding", x_axis_label='x',y_axis_label='y', output_backend = "svg",
                         x_range=[-1,1],y_range=[-1,1],width=800, height=800,tools=TOOLS,tooltips=TOOLTIPS)
 
             p.circle(x=0.0,y=0.0,fill_alpha=0.1,line_color='black',size=20,radius=1,fill_color=None,line_width=2,muted=False)
@@ -346,6 +346,7 @@ def network_app():
         
         st.write(f'Number of communities: {Comunidades["Number of communities"]}')
         st.table(Comunidades["Communities_topology"].T)
+
         st.markdown('---')
         st.markdown("### Plot")
 
@@ -367,6 +368,18 @@ def network_app():
                       'HDBSCAN':HD[2],
                       'Community':Comunidades['Community_data'].values.ravel()})
 
+        #Download centralities
+        name_file='Output_Centralities.csv'
+        DF=SparrDF
+        csv = convert_df(DF)
+            
+        st.download_button(
+                label="Download file",
+                data=csv,
+                file_name=name_file,
+                mime='text/csv',help='This file contains \
+                centralities and community information for each node')
+
 
         if M.number_of_nodes()>500:
             fig1=plot_matplotlib(graph=M,frame=SparrDF,
@@ -383,14 +396,13 @@ def network_app():
             st.pyplot(fig=fig2)
             
         else:
-            
             fig3=plot_bokeh(graph=M,frame=SparrDF,
                            max=MAX,
                            min=MIN,
                            kind_network=str(layout_kind).lower(),
                            kind='HDBSCAN')
             st.text('Outliers have a value of -1')
-
+            
             fig4=plot_bokeh(graph=M,frame=SparrDF,
                            max=MAX,
                            min=MIN,
@@ -399,17 +411,6 @@ def network_app():
             st.bokeh_chart(fig3)
             st.bokeh_chart(fig4)
 
-        #Download centralities
-        name_file='Output_Centralities.csv'
-        DF=SparrDF
-        csv = convert_df(DF)
-            
-        st.download_button(
-                label="Download file",
-                data=csv,
-                file_name=name_file,
-                mime='text/csv',help='This file contains \
-                centralities information for each node')
         
 
 def core_app():
