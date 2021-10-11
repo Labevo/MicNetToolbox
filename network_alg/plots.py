@@ -96,7 +96,7 @@ def plot_matplotlib(graph:nx.Graph,frame:pd.DataFrame,
               width=cache)
 
     proxies = [make_proxy(clr, h2,lw=5) for clr in ['green','red']]
-    plt.legend(proxies,['Postive','Negative'])
+    plt.legend(proxies,['Positive','Negative'])
 
     return fig
 
