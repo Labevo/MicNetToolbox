@@ -236,7 +236,7 @@ def dashboar_app():
             TOOLTIPS=[("Name", "@Name")]
     
 
-        with st.spinner("In progess"):
+        with st.spinner("In progress"):
             st.info("Embedding plot")
             embedding_,o,l=embedding_outliers.fit(X)
                 
@@ -327,7 +327,7 @@ def network_app():
         NetM=NetWork_MicNet()
         
         st.markdown("### Large-scale metrics of network")
-        with st.spinner("In progess"):
+        with st.spinner("In progress"):
             NetM.basic_description(corr=sparcc_corr)
         table1=pd.Series(NetM.get_description()).to_frame(name='Basic network information')
         st.table(table1)
@@ -335,14 +335,14 @@ def network_app():
 
 
         st.markdown("### Basic structural balance information")
-        with st.spinner("In progess"):
+        with st.spinner("In progress"):
             t2nw=NetM.structural_balance(M)
         
         table2=pd.Series(t2nw).to_frame(name='Structural balance')
         st.table(table2)
         st.markdown('---')
         st.markdown("## Communities information")
-        with st.spinner("In progess"):
+        with st.spinner("In progress"):
             Comunidades=NetM.community_analysis(Mnorm)
         
         st.write(f'Number of communities: {Comunidades["Number of communities"]}')
