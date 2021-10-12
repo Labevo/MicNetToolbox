@@ -298,6 +298,9 @@ def network_app():
     file_input=st.sidebar.file_uploader(label='Upload SparCC output file',type=['csv'],
     help="If you don't have this file, please calculate it at SparCC section")
 
+    file_input2=st.sidebar.file_uploader(label='Upload HDBSCAN output file',type=['csv'],
+    help="If you don't have this file, please calculate it at UMAP/HDBSCAN section")
+
     layout_kind=st.sidebar.selectbox(label='Plot layout',options=['Circular','Spring'],
                              help='For more information check layout in networkx')
 
@@ -305,11 +308,11 @@ def network_app():
     B=st.sidebar.button(label='Run estimation')
 
 
-    if file_input is not None and B==True:
+    if file_input is not None and file_input2 is not None and B==True:
         sparcc_corr = pd.read_csv(file_input,header=0,index_col=0).fillna(0)
+        HD = pd.read_csv(file_input2,header=0,index_col=0).fillna(0)
         
         #sparcc_corr=sparcc_corr.drop(columns=[0])
-
         MAX=sparcc_corr.max().max()
         MIN=sparcc_corr.min().min()
         SHAPE=sparcc_corr.shape
@@ -318,7 +321,6 @@ def network_app():
             st.error('Error')
             raise EOFError('Error')
 
-        
         #Graph Process
 
         M=_build_network(sparcc_corr)
@@ -353,26 +355,46 @@ def network_app():
 
         Centrality=NetM.key_otus(Mnorm)
         CS_=int(sparcc_corr.shape[0]*.1)
-        embedding=Embedding_Output(metric_umap='euclidean',
-                        metric_hdb='braycurtis',
-                        n_neighbors=5,
-                        output=True,
-                        min_cluster_size=CS_,
-                        get_embedding=False)
-        HD=embedding.fit(sparcc_corr)
+        
+        #embedding=Embedding_Output(metric_umap='euclidean',
+        #                metric_hdb='braycurtis',
+        #                n_neighbors=5,
+        #                output=True,
+        #                min_cluster_size=CS_,
+        #                get_embedding=False)
+        #HD=embedding.fit(sparcc_corr)
         
         SparrDF=pd.DataFrame({'OTUS':Centrality['NUM_OTUS'],
                       'Degree_Centrality':Centrality['Degree centrality'],
                       'Betweeness_Centrality':Centrality['Betweeness centrality'],
                       'Closeness_Centrality':Centrality['Closeness centrality'],
                       'PageRank':Centrality['PageRank'],
-                      'HDBSCAN':HD[2],
+                      'HDBSCAN':HD.Cluster,
                       'Community':Comunidades['Community_data'].values.ravel()})
 
         #Download centralities
         name_file='Output_Centralities.csv'
         DF=SparrDF
         csv = convert_df(DF)
+
+
+        fig3=plot_bokeh(graph=M,frame=SparrDF,
+               nodes = M.number_of_nodes(),
+               max=MAX,
+               min=MIN,
+               kind_network=str(layout_kind).lower(),
+               kind='HDBSCAN')
+        st.text('Outliers have a value of -1')
+        
+        fig4=plot_bokeh(graph=M,frame=SparrDF,
+                       nodes = M.number_of_nodes(),
+                       max=MAX,
+                       min=MIN,
+                       kind_network=str(layout_kind).lower(),
+                       kind='Community')
+        st.bokeh_chart(fig3)
+        st.bokeh_chart(fig4)
+
             
         st.download_button(
                 label="Download file",
@@ -381,40 +403,6 @@ def network_app():
                 mime='text/csv',help='This file contains \
                 centralities and community information for each node')
 
-        if M.number_of_nodes()>500:
-            fig1=plot_matplotlib(graph=M,frame=SparrDF,
-                           max=MAX,
-                           min=MIN,
-                           kind_network=str(layout_kind).lower(),
-                           kind='HDBSCAN')
-            st.text('Outliers in red')
-
-            fig2=plot_matplotlib(graph=M,frame=SparrDF,
-                           max=MAX,
-                           min=MIN,
-                           kind_network=str(layout_kind).lower(),
-                           kind='Communities')
-
-            st.pyplot(fig=fig1, transparent= True)
-            st.pyplot(fig=fig2, transparent= True)
-            
-        else:
-            fig3=plot_bokeh(graph=M,frame=SparrDF,
-                           max=MAX,
-                           min=MIN,
-                           kind_network=str(layout_kind).lower(),
-                           kind='HDBSCAN')
-            st.text('Outliers have a value of -1')
-            
-            fig4=plot_bokeh(graph=M,frame=SparrDF,
-                           max=MAX,
-                           min=MIN,
-                           kind_network=str(layout_kind).lower(),
-                           kind='Community')
-            st.bokeh_chart(fig3)
-            st.bokeh_chart(fig4)
-
-        
 
 def core_app():
 
