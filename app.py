@@ -137,9 +137,10 @@ def sparcc_app():
             st.text("Data sample")
             st.dataframe(dataframe.head())
         
-            if remove_taxa!=None:
+
+            if remove_taxa in dataframe.columns:
                 dataframe=dataframe.drop(columns=[remove_taxa])
-        
+
             SparCC_MN.run_all(data_input=dataframe)
             st.info("Correlation estimation has finished")
 
