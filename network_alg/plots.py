@@ -96,13 +96,14 @@ def plot_matplotlib(graph:nx.Graph,frame:pd.DataFrame,
               width=cache)
 
     proxies = [make_proxy(clr, h2,lw=5) for clr in ['green','red']]
-    plt.legend(proxies,['Postive','Negative'])
+    plt.legend(proxies,['Positive','Negative'])
 
     return fig
 
 
 
-def plot_bokeh(graph:nx.Graph,frame:pd.DataFrame,
+def plot_bokeh(graph:nx.Graph,frame:pd.DataFrame,  
+    nodes:int,
     max:float,min:float,
     kind:str='HDBSCAN',
     kind_network:str='circular'):
@@ -130,12 +131,23 @@ def plot_bokeh(graph:nx.Graph,frame:pd.DataFrame,
     else:
         raise ValueError('Invalid layout type')
 
+    if nodes < 501:
+        tools = "pan,wheel_zoom,save,reset,box_zoom"
+        tooltips = [("Name", "@index")]
+    else:
+        tools = "save"
+        tooltips =None
+
     plot = figure(width=900,
                   height=900,
                   x_range=Range1d(-1.1,1.1), 
                   y_range=Range1d(-1.1,1.1),
-                  tooltips =[("Name", "@index")],
-                  tools="pan,wheel_zoom,save,reset,box_zoom", output_backend="svg")
+                  tooltips =tooltips,
+                  tools=tools, output_backend="svg")
+    
+    if nodes > 500:
+        plot.toolbar.active_inspect = None
+
 
     plot.title.text = f"Network - {kind}"
     plot.title.text_font_size = "30px"
