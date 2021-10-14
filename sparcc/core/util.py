@@ -123,7 +123,7 @@ def clean_data_folder(path_folder:Union[str,Path])->Any:
     path_folder=Path(path_folder)
 
     if path_folder.is_dir():
-        rmtree(path_folder.resolve())
+        rmtree(path_folder.resolve(), ignore_erros = True)
     else:
         raise EOFError("This is not a directory")
 

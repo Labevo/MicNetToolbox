@@ -206,9 +206,13 @@ class SparCC_MicNet:
                 print("Error: {0}:{1}".format('./temp_files/*',e.strerror))
             
             self.path_corr_file=os.path.join(str(self.savedir),'corr_files')
-            os.makedirs(self.path_corr_file)
             self.path_cov_file=os.path.join(str(self.savedir),'cov_files')
-            os.makedirs(self.path_cov_file)
+            
+            if not os.path.exists(self.path_corr_file):
+                os.makedirs(self.path_corr_file)
+
+            if not os.path.exists(self.path_cov_file):
+                os.makedirs(self.path_cov_file)
 
         else:
             os.makedirs(self.savedir)
@@ -232,7 +236,7 @@ class SparCC_MicNet:
     def _filter_otus(self,frame:pd.DataFrame)->pd.DataFrame:
         
 
-        frame=frame.loc[(frame!=0).sum(axis=1)>=2,:].copy()
+        frame=frame.loc[(frame!=0).sum(axis=1)>=5,:].copy()
         self._Index_col=frame.index
 
         return frame
