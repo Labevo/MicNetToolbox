@@ -206,13 +206,9 @@ class SparCC_MicNet:
                 print("Error: {0}:{1}".format('./temp_files/*',e.strerror))
             
             self.path_corr_file=os.path.join(str(self.savedir),'corr_files')
+            os.makedirs(self.path_corr_file)
             self.path_cov_file=os.path.join(str(self.savedir),'cov_files')
-            
-            if not os.path.exists(self.path_corr_file):
-                os.makedirs(self.path_corr_file)
-
-            if not os.path.exists(self.path_cov_file):
-                os.makedirs(self.path_cov_file)
+            os.makedirs(self.path_cov_file)
 
         else:
             os.makedirs(self.savedir)
