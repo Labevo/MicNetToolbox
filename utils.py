@@ -10,9 +10,11 @@ def kind_file(x:str)->bool:
 
 def filter_otus(frame:pd.DataFrame)->pd.DataFrame:
     #Remove singletons
-    frame=frame.loc[(frame!=0).sum(axis=1)>=2,:]
+    frame = frame.loc[(frame!=0).sum(axis=1)>=2,:]
     
     #Remove low abudance < 5
     frame = frame.loc[frame.sum(axis=1)>5,:]
 
-    return frame
+    indx = list(frame.index)
+
+    return indx,frame

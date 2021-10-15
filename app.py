@@ -221,8 +221,8 @@ def dashboar_app():
         if taxa:
             X=dataframe.iloc[:,2:].copy()
             X=X.astype('float').copy()
-            X=filter_otus(X)
-            indx = X.index
+            indx, X=filter_otus(X)
+            
             Text=dataframe.iloc[indx,:2].copy()
             
             Taxa=dataframe.iloc[indx,1].str.split(';').str.get(0)+'-'+\
