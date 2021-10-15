@@ -97,7 +97,7 @@ def HDBSCAN_subnetwork(corr:Union[np.ndarray,pd.DataFrame],
     corr : interaction matrix as a pandas dataframe or numpy matrix of 
             dimension m x m. 
     
-    HDBSCAN: pandas dataframe of dimensions m x 1 containing the clusted id for each cluster 
+    HDBSCAN: pandas dataframe of dimensions m x 1 containing the cluster id for each cluster 
              found, where outliers are identified with value -1. 
 
     Returns
@@ -152,4 +152,9 @@ def HDBSCAN_subnetwork(corr:Union[np.ndarray,pd.DataFrame],
         columns = [f'Cluster_{i}' for i in range(0,ng)]
         )
     
-    return hdbscan_df
+    data_dict = {
+        'Number of clusters':ng,
+        'Clusters_topology': hdbscan_df,
+        }
+
+    return data_dict

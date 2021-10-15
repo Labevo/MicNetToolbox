@@ -346,16 +346,6 @@ def network_app():
         
         table2=pd.Series(t2nw).to_frame(name='Structural balance')
         st.table(table2)
-        st.markdown('---')
-        st.markdown("## Communities information")
-        with st.spinner("In progress"):
-            Comunidades=NetM.community_analysis(Mnorm)
-        
-        st.write(f'Number of communities: {Comunidades["Number of communities"]}')
-        st.table(Comunidades["Communities_topology"].T)
-
-        st.markdown('---')
-        st.markdown("### Plot")
 
         Centrality=NetM.key_otus(Mnorm)
         CS_=int(sparcc_corr.shape[0]*.1)
@@ -367,7 +357,18 @@ def network_app():
         #                min_cluster_size=CS_,
         #                get_embedding=False)
         #HD=embedding.fit(sparcc_corr)
+
+        # Communities table and plot
+        st.markdown('---')
+        st.markdown("## Communities information")
+        with st.spinner("In progress"):
+            Comunidades=NetM.community_analysis(Mnorm)
         
+        st.write(f'Number of communities: {Comunidades["Number of communities"]}')
+        st.table(Comunidades["Communities_topology"].T)
+
+        st.text('Outliers have a value of -1')
+
         SparrDF=pd.DataFrame({'OTUS':Centrality['NUM_OTUS'],
                       'Degree_Centrality':Centrality['Degree centrality'],
                       'Betweeness_Centrality':Centrality['Betweeness centrality'],
@@ -375,37 +376,44 @@ def network_app():
                       'PageRank':Centrality['PageRank'],
                       'HDBSCAN':HD.Cluster,
                       'Community':Comunidades['Community_data'].values.ravel()})
-
-        #Download centralities
-        name_file='Output_Centralities.csv'
-        DF=SparrDF
-        csv = convert_df(DF)
-
-
-        fig3=plot_bokeh(graph=M,frame=SparrDF,
-               nodes = M.number_of_nodes(),
-               max=MAX,
-               min=MIN,
-               kind_network=str(layout_kind).lower(),
-               kind='HDBSCAN')
-        st.text('Outliers have a value of -1')
         
-        fig4=plot_bokeh(graph=M,frame=SparrDF,
+        fig3=plot_bokeh(graph=M,frame=SparrDF,
                        nodes = M.number_of_nodes(),
                        max=MAX,
                        min=MIN,
                        kind_network=str(layout_kind).lower(),
                        kind='Community')
         st.bokeh_chart(fig3)
+
+        #HDBSCAN table and plot
+        st.markdown('---')
+        st.markdown("## HDBSCAN clusters information")
+        with st.spinner("In progress"):
+            Clusters=NetM.HDBSCAN_subnetwork(sparcc_corr, HD.iloc[:,1])
+        
+        st.write(f'Number of clusters: {Clusters["Number of clusters"]}')
+        st.table(Clusters["Clusters_topology"].T)
+
+        fig4=plot_bokeh(graph=M,frame=SparrDF,
+               nodes = M.number_of_nodes(),
+               max=MAX,
+               min=MIN,
+               kind_network=str(layout_kind).lower(),
+               kind='HDBSCAN')
         st.bokeh_chart(fig4)
 
-            
+        #Download centralities
+        name_file='Output_Centralities.csv'
+        DF=SparrDF
+        csv = convert_df(DF)
         st.download_button(
                 label="Download file",
                 data=csv,
                 file_name=name_file,
                 mime='text/csv',help='This file contains \
                 centralities and community information for each node')
+
+        
 
 
 def core_app():
