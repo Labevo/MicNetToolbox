@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np 
 import matplotlib as mpl
 import streamlit as st 
-from utils import kind_file
+from utils import kind_file, filter_otus
 from umap_hdbscan import Embedding_Output 
 
 from sparcc import SparCC_MicNet
@@ -32,7 +32,6 @@ from network_alg import NetWork_MicNet
 from network_alg import HDBSCAN_subnetwork 
 from network_alg import plot_matplotlib
 from network_alg import plot_bokeh
-
 
 #CONTS
 key='1e629b5c8f2e7fff85ed133a8713d545678bd44badac98200cbd156d'
@@ -210,28 +209,33 @@ def dashboar_app():
             
         if kind_file(file_input.name):
             dataframe = pd.read_table(file_input)
+
         else:
             dataframe = pd.read_csv(file_input)
 
-            
+
         st.info("Data sample")
         st.dataframe(dataframe.head())
 
 
         if taxa:
             X=dataframe.iloc[:,2:].copy()
-            Text=dataframe.iloc[:,:2].copy()
-            
             X=X.astype('float').copy()
- 
-            Taxa=dataframe.iloc[:,1].str.split(';').str.get(0)+'-'+\
-                    dataframe.iloc[:,1].str.split(';').str.get(1)+'-'+\
-                    dataframe.iloc[:,1].str.split(';').str.get(5)
+            X=filter_otus(X)
+            indx = X.index
+            Text=dataframe.iloc[indx,:2].copy()
+            
+            Taxa=dataframe.iloc[indx,1].str.split(';').str.get(0)+'-'+\
+                    dataframe.iloc[indx,1].str.split(';').str.get(1)+'-'+\
+                    dataframe.iloc[indx,1].str.split(';').str.get(5)
             TOOLTIPS=[("Name", "@Name"),("Taxa","@Taxa")]
         else:
             X=dataframe.iloc[:,1:].copy()
-            Text=dataframe.iloc[:,:1].copy()
+            X=filter_otus(X)
+            indx = X.index
+            Text=dataframe.iloc[indx,:1].copy()
             X=X.astype('float').copy()
+            
 
             TOOLTIPS=[("Name", "@Name")]
     

@@ -236,7 +236,7 @@ class SparCC_MicNet:
     def _filter_otus(self,frame:pd.DataFrame)->pd.DataFrame:
         
 
-        frame=frame.loc[(frame!=0).sum(axis=1)>=5,:].copy()
+        frame=frame.loc[(frame!=0).sum(axis=1)>=2,:].copy()
         self._Index_col=frame.index
 
         return frame
