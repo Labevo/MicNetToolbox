@@ -116,6 +116,7 @@ def sparcc_app():
     if file_input is not None and B==True:
         SparCC_MN=SparCC_MicNet(n_iteractions=n_iteractions,
                                     x_iteractions=x_iteractions,
+                                    low_abundance=low_abundance,
                                     threshold=threshold,
                                     normalization=normalization,
                                     log_transform=log_transform,
