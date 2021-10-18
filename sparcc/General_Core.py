@@ -41,6 +41,7 @@ class SparCC_MicNet:
     def __init__(self,
                 name:str='experiment_sparCC',
                 method:str='sparcc',
+                low_abundance:bool=False,
                 n_iteractions:int= 2,
                 x_iteractions:int= 2,
                 threshold:float= 0.1,
@@ -71,6 +72,7 @@ class SparCC_MicNet:
         self.type_pvalues=type_pvalues
         self.outfile_pvals=outfile_pvals
         self.name_output_file=name_output_file
+        self.low_abundance=low_abundance
 
     def compute(self,data_input:Union[str,pd.DataFrame]='sparcc/example/fake_data.txt',
                     save_corr_file:str='sparcc/example/cor_sparcc.csv'):
@@ -153,7 +155,7 @@ class SparCC_MicNet:
         clean_previous_file(self.outfile_pvals)
 
         data_input=self._validation_format(data_input)
-        data_input=self._filter_otus(data_input)
+        data_input=self._filter_otus(data_input, self.low_abundance)
 
         self.compute(data_input,save_corr_file)
         self.bootstrapping(data_input='')
@@ -233,12 +235,15 @@ class SparCC_MicNet:
         DF_out=pd.DataFrame(index=frame.index,data=values_df)
         return DF_out
     
-    def _filter_otus(self,frame:pd.DataFrame)->pd.DataFrame:
+    def _filter_otus(self,frame:pd.DataFrame, low_abundance:bool=False)->pd.DataFrame:
         
         #Remove singletons
         frame=frame.loc[(frame!=0).sum(axis=1)>=2,:].copy()
         #Remove low abudance < 5
-        frame=frame.loc[frame.sum(axis=1)>5,:].copy()
+        if low_abundance==True:
+            frame=frame.loc[frame.sum(axis=1)>5,:].copy()
+        else: 
+            pass
 
         self._Index_col=frame.index
 

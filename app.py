@@ -93,7 +93,7 @@ def menu_app():
 def sparcc_app():
     st.sidebar.header("File")
     file_input=st.sidebar.file_uploader("Upload file",type=["csv","txt"])
-    abudance_filter=st.sidebar.selectbox('Filter low abudance',options=[True, False],index=1,
+    low_abundance=st.sidebar.selectbox('Filter low abudance',options=[True, False],index=1,
                                 help='Do you want to filter low abundace (<5) OTUs?')
 
     st.sidebar.title("Correlation parameters")
@@ -127,7 +127,7 @@ def sparcc_app():
                                     outfile_pvals='sparcc/example/pvals/pvals_one_sided.csv',
                                     name_output_file="sparcc_output"
                                     )
-        
+
         st.write(SparCC_MN)
         st.write('-----')
 
