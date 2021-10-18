@@ -91,9 +91,12 @@ def menu_app():
 
 
 def sparcc_app():
-    st.sidebar.title("Correlation parameters")
     st.sidebar.header("File")
     file_input=st.sidebar.file_uploader("Upload file",type=["csv","txt"])
+    abudance_filter=st.sidebar.selectbox('Filter low abudance',options=[True, False],index=1,
+                                help='Do you want to filter low abundace (<5) OTUs?')
+
+    st.sidebar.title("Correlation parameters")
     st.sidebar.header("Number of inferences")
     n_iteractions=st.sidebar.slider(label='n_iter',min_value=2,max_value=50,step=1,value=20)
     st.sidebar.header("Number of exclusions")
@@ -124,6 +127,7 @@ def sparcc_app():
                                     outfile_pvals='sparcc/example/pvals/pvals_one_sided.csv',
                                     name_output_file="sparcc_output"
                                     )
+        
         st.write(SparCC_MN)
         st.write('-----')
 
@@ -177,6 +181,10 @@ def dashboar_app():
         
     file_input=st.sidebar.file_uploader(label='Input file',type=['txt','csv'],
                                             help='Upload the file to process')
+    taxa=st.sidebar.selectbox('Include Taxa',options=[True, False],index=1,
+                                help='Does your file includes a column indicating taxa?')
+    abudance_filter=st.sidebar.selectbox('Filter low abudance',options=[True, False],index=1,
+                                help='Do you want to filter low abundace (<5) OTUs?')
 
     st.sidebar.markdown('---')
     st.sidebar.header('UMAP parameters')
@@ -188,8 +196,6 @@ def dashboar_app():
                                        value=2,help='Check UMAP documentation')
     metric_umap=st.sidebar.selectbox('Select metric',options=METRIC,index=7,
                                         help='Check UMAP documentation')
-    taxa=st.sidebar.selectbox('Include Taxa',options=[True, False],index=1,
-                                help='Does your file includes a column indicating taxa?')
     st.sidebar.markdown('---')
     st.sidebar.header('HDBSCAN parameters')
     metric_hdb=st.sidebar.selectbox('Select metric',options=METRIC_HDB,index=3,
@@ -221,7 +227,7 @@ def dashboar_app():
         if taxa:
             X=dataframe.iloc[:,2:].copy()
             X=X.astype('float').copy()
-            indx, X=filter_otus(X)
+            indx, X=filter_otus(X, abudance_filter)
             
             Text=dataframe.iloc[indx,:2].copy()
             
@@ -231,8 +237,7 @@ def dashboar_app():
             TOOLTIPS=[("Name", "@Name"),("Taxa","@Taxa")]
         else:
             X=dataframe.iloc[:,1:].copy()
-            X=filter_otus(X)
-            indx = X.index
+            indx, X=filter_otus(X,abudance_filter)
             Text=dataframe.iloc[indx,:1].copy()
             X=X.astype('float').copy()
             
@@ -320,13 +325,18 @@ def network_app():
         MAX=sparcc_corr.max().max()
         MIN=sparcc_corr.min().min()
         SHAPE=sparcc_corr.shape
+        SHAPE2=HD.shape
 
         if int(SHAPE[1])!=int(SHAPE[0]):
             st.error('Error')
-            raise EOFError('Error')
+            raise EOFError('Error, correlation matrix is not square')
+
+        if int(SHAPE[0])!=int(SHAPE2[0]):
+            st.error('Error')
+            raise EOFError('Error, correlation matrix and HDBSCAN file need to have the same number of rows')
+
 
         #Graph Process
-
         M=_build_network(sparcc_corr)
         Mnorm=create_normalize_graph(sparcc_corr)
 
