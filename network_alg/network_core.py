@@ -102,7 +102,7 @@ class NetWork_MicNet:
         try: 
             mod = nx_comm.modularity(graph, nx_comm.greedy_modularity_communities(graph))
         except ZeroDivisionError:
-            mod = 'nan'
+            mod = float('nan')
 
         #Description
 
@@ -115,17 +115,23 @@ class NetWork_MicNet:
         self.description['density']=nx.density(graph)        
         self.description['average_degree']=np.mean([graph.degree(n) for n in graph.nodes()])
         self.description['degree_std']=np.std([graph.degree(n) for n in graph.nodes()])
-        self.description['diameter']=nx.diameter(graph)
+        self.description['components']=nx.number_connected_components(graph)
         self.description['average_clustering']=nx.average_clustering(graph)
-        self.description['average_shortest_path_length']=nx.average_shortest_path_length(graph)
         self.description['modularity']=mod
+        if nx.is_connected(graph):
+            pass
+        else:
+            graph=graph.subgraph(max(nx.connected_components(graph), key=len))
+        
+        self.description['diameter']=nx.diameter(graph)
+        self.description['average_shortest_path_length']=nx.average_shortest_path_length(graph)
         self.description['small_world_index']=small_world_index(graph,
-                                                                n=self.description['nodes'],
-                                                                p=self.description['density'],
-                                                                cc=self.description['average_clustering'],
-                                                                l=self.description['average_shortest_path_length']
-                                                                )
-
+                                                        n=self.description['nodes'],
+                                                        p=self.description['density'],
+                                                        cc=self.description['average_clustering'],
+                                                        l=self.description['average_shortest_path_length']
+                                                        )
+        
     def get_description(self)->Dict[str,Union[int,float]]:
 
         if not hasattr(self,'description'):
@@ -140,6 +146,7 @@ class NetWork_MicNet:
         'Density':self.description['density'], 
         'Average degree':self.description['average_degree'],
         'Degree std': self.description['degree_std'],
+        'Components': self.description['components'],
         'Diameter':self.description['diameter'],
         'Clustering coefficient':self.description['average_clustering'],
         'Shortest average path length': self.description['average_shortest_path_length'],
