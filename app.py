@@ -292,6 +292,8 @@ def dashboar_app():
         #if name_file is not None:
         name_file='Output_UMAP_HDBSCAN.csv'
         DF=pd.DataFrame()
+        if taxa:
+            DF['Taxa']= Text.iloc[:,1]
         DF['Outliers']=o
         DF['Cluster']=l
         csv = convert_df(DF)
