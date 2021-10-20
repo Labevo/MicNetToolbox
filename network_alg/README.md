@@ -98,7 +98,7 @@ the degree_comparison function returns a dataframe with the bins and CCDF for th
 We suggest to plot the results as follows:
 
 ~~~python
-#Plotting average shortest path under the asumption of a random, small-world and scale-free topology.
+#Plotting CCDF data vs simulation
 import matplotlib.pyplot as plt
 import seaborn as sns
 
