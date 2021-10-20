@@ -13,6 +13,6 @@ The other analyses presented in Favila, Madrigal-Trejo et al. (in revision) are 
 To import the module locate yourself in the MicNetToolbox folder and run the following code:
 
 ~~~python
-import network_alg
+from network_alg import percolation_sim, topology_boostrap, degree_comparison
 ~~~
 

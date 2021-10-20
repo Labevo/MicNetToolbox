@@ -157,116 +157,6 @@ class NetWork_MicNet:
         return data_dict
 
 
-    def percolation_sim(self,graph:nx.Graph)->pd.DataFrame:
-        '''
-        Function that performs percolation on the correlation matrix
-        corrm, by removing the proportion of nodes specified in prem.
-        The removal can be done : randomly, or by degree, closness or betweeness 
-        centrality.
-        
-        Parameters
-        ----------
-        corr : corelation obtain from SparCC read as a pandas DataFrame or numpy matrix
-        prem : proportion of nodes to remove in each iteration. Only fractional values.
-        per_type : can take the values 'random', 'deg_centrality', 'clos_centrality', 'bet_centrality' 
-                specifying how to remove the nodes from the interaction nework.
-
-        Returns
-        -------
-        df : pandas dtaframe with each percolation iteration, displaying the percentage of removal
-            and the change in the following netowrk metrics: 'Network density','Average degree', 
-            'Number of components', 'Size of giant component','Fraction of giant component', 
-            'Number of communities' and 'Modularity'.
-        '''
-
-        # Nodes to remove each iteration
-        n = graph.number_of_nodes()
-        nr = int(self.prem*n)
-        nr_cum = 0
-        
-        if self.per_type == 'random':
-            #Initial node list
-            nod_list = list(graph.nodes())
-        elif self.per_type == 'deg_centrality':
-            cent = nx.degree_centrality(graph)
-            cent = dict(sorted(cent.items(), key=lambda item: item[1], reverse=True))
-            nod_list =list( cent.keys())
-        elif self.per_type == 'bet_centrality':
-            cent = nx.betweenness_centrality(graph)
-            cent = dict(sorted(cent.items(), key=lambda item: item[1], reverse=True))
-            nod_list =list( cent.keys())
-        elif self.per_type == 'clos_centrality':
-            cent = nx.closeness_centrality(graph)
-            cent = dict(sorted(cent.items(), key=lambda item: item[1], reverse=True))
-            nod_list =list( cent.keys())
-
-        #Counter 
-        j = 0
-        
-        #Data to store results
-        df = pd.DataFrame(columns = ['Fraction of removal',
-                                     'Network density','Average degree', 
-                                     'Number of components', 'Size of giant component',
-                                     'Fraction of giant component', 'Number of communities',
-                                     'Modularity'])
-        
-        #Loop
-        while len(nod_list)>nr:      
-            # Choose nodes
-            if self.per_type == 'random':
-                nod_rem = sample(nod_list,nr) 
-            elif self.per_type == 'deg_centrality' or self.per_type == 'bet_centrality' or self.per_type == 'clos_centrality':
-                nod_rem  = nod_list[0:nr]
-                
-            #Nodes removed so far
-            nr_cum = nr_cum + nr
-            
-            #Remove nodes from network
-            graph.remove_nodes_from(nod_rem)
-            
-            #Fraction of current removal
-            fr_rem = nr_cum/n
-            
-            #Calculate metrics and store them
-            x = []
-            # 1- Fraction of removal
-            x.append(fr_rem)
-            # 2- netowrk density
-            x.append(nx.density(graph))
-            # 3- average degree
-            x.append(np.mean([graph.degree(n) for n in graph.nodes()]))
-            # Number of  components
-            x.append(nx.number_connected_components(graph))
-            # Calculat size of largest component
-            components = nx.connected_components(graph)
-            x.append(len(max(components, key=len)))
-            #Fractions of nodes belonging to the giant component
-            x.append(x[4]/nx.number_of_nodes(graph))
-            # Calculate comminuties
-            com = community.best_partition(graph)
-            x.append(len(set(com.values())))
-            #Calculate modularity
-            try: 
-                x.append(nx_comm.modularity(graph, nx_comm.greedy_modularity_communities(graph)))
-            except ZeroDivisionError:
-                x.append('nan')
-        
-            #append current iteration to data
-            df.loc[j] = x 
-            
-            #Node list from current network
-            
-            if self.per_type == 'random':
-                nod_list = list(graph.nodes())
-            elif self.per_type == 'deg_centrality' or self.per_type == 'bet_centrality' or self.per_type == 'clos_centrality':
-                for elem in nod_rem:
-                    nod_list.remove(elem)
-                    
-            #Update counter 
-            j = j + 1
-            
-        return df
-
     @staticmethod    
     def structural_balance(graph:nx.Graph)->Dict[str,float]:
         '''
@@ -836,5 +726,226 @@ def degree_comparison(corr:np.ndarray, topology:str = 'random', bins:int = 20)->
 
 
 
-     
+def percolation_sim(corr, prem = 0.1, per_type = 'random'):
+    '''
+    Function that performs percolation on the correlation matrix
+    corrm, by removing the proportion of nodes specified in prem.
+    The removal can be done : randomly, or by degree, closness or betweeness 
+    centrality.
+    
+    Parameters
+    ----------
+    corr : corelation obtain from SparCC read as a pandas DataFrame or numpy matrix
+    prem : proportion of nodes to remove in each iteration. Only fractional values.
+    per_type : can take the values 'random', 'deg_centrality', 'clos_centrality', 'bet_centrality' 
+               specifying how to remove the nodes from the interaction nework.
 
+    Returns
+    -------
+    df : pandas dtaframe with each percolation iteration, displaying the percentage of removal
+        and the change in the following netowrk metrics: 'Network density','Average degree', 
+        'Number of components', 'Size of giant component','Fraction of giant component', 
+        'Number of communities' and 'Modularity'.
+    '''
+
+    corrnorm = normalize_corr(corr)
+    Gp = build_network(corrnorm)
+    # Nodes to remove each iteration
+    n = Gp.number_of_nodes()
+    nr = int(prem*n)
+    nr_cum = 0
+    
+    if per_type == 'random':
+        #Initial node list
+        nod_list = list(Gp.nodes())
+    elif per_type == 'deg_centrality':
+        cent = nx.degree_centrality(Gp)
+        cent = dict(sorted(cent.items(), key=lambda item: item[1], reverse=True))
+        nod_list =list( cent.keys())
+    elif per_type == 'bet_centrality':
+        cent = nx.betweenness_centrality(Gp)
+        cent = dict(sorted(cent.items(), key=lambda item: item[1], reverse=True))
+        nod_list =list( cent.keys())
+    elif per_type == 'clos_centrality':
+        cent = nx.closeness_centrality(Gp)
+        cent = dict(sorted(cent.items(), key=lambda item: item[1], reverse=True))
+        nod_list =list( cent.keys())
+
+    #Counter 
+    j = 0
+    
+    #Data to store results
+    df = pd.DataFrame(columns = ['Fraction of removal','Network density','Average degree', 'Number of components', 'Size of giant component','Fraction of giant component', 'Number of communities', 'Modularity'])
+    
+    #Loop
+    while len(nod_list)>nr:      
+        # Choose nodes
+        if per_type == 'random':
+            nod_rem = sample(nod_list,nr) 
+        elif per_type == 'deg_centrality' or per_type == 'bet_centrality' or per_type == 'clos_centrality':
+            nod_rem  = nod_list[0:nr]
+            
+        #Nodes removed so far
+        nr_cum = nr_cum + nr
+        
+        #Remove nodes from network
+        Gp.remove_nodes_from(nod_rem)
+        
+        #Fraction of current removal
+        fr_rem = nr_cum/n
+        
+        #Calculate metrics and store them
+        x = []
+        # 1- Fraction of removal
+        x.append(fr_rem)
+        # 2- netowrk density
+        x.append(nx.density(Gp))
+        # 3- average degree
+        x.append(np.mean([Gp.degree(n) for n in Gp.nodes()]))
+        # Number of  components
+        x.append(nx.number_connected_components(Gp))
+        # Calculat size of largest component
+        components = nx.connected_components(Gp)
+        x.append(len(max(components, key=len)))
+        #Fractions of nodes belonging to the giant component
+        x.append(x[4]/nx.number_of_nodes(Gp))
+        # Calculate comminuties
+        com = community.best_partition(Gp)
+        x.append(len(set(com.values())))
+        #Calculate modularity
+        try: 
+            x.append(nx_comm.modularity(Gp, nx_comm.greedy_modularity_communities(Gp)))
+        except ZeroDivisionError:
+            x.append('nan')
+    
+        #append current iteration to data
+        df.loc[j] = x 
+        
+        #Node list from current network
+        
+        if per_type == 'random':
+            nod_list = list(Gp.nodes())
+        elif per_type == 'deg_centrality' or per_type == 'bet_centrality' or per_type == 'clos_centrality':
+            for elem in nod_rem:
+                nod_list.remove(elem)
+                
+        #Update counter 
+        j = j + 1
+        
+    return df
+
+
+
+def percolation_by_group(corr, prem = 0.1, groups = list()):
+    '''
+    Function that performs percolation on the correlation matrix
+    corr  removing the proportion of nodes specified in prem.
+    The removal can by removing nodes by groups which correspond to species, gender or 
+    any other taxa leve.
+    
+    Parameters
+    ----------
+    corr : corelation obtain from SparCC read as a pandas DataFrame or numpy matrix of size m x m.
+    prem : proportion of nodes to remove in each iteration. Only fractional values.
+    groups: list of size m which assigns a group id to each node. eg. groups = ['g1', 'g1', 'g2'...]
+            The length fo the list should be the number of nodes present in the interaction matrix.
+
+    Returns
+    -------
+    df : pandas dicitionary containing a pandas dataframe with the percolation simulation for each individual group.
+        Each dataset contains in the row each percolation iteration, displaying the in the columns the number of nodes
+        removed and the change as nodes were removed in the following netowrk metrics: 'Network density','Average degree', 
+        'Number of components', 'Size of giant component','Fraction of giant component', 
+        'Number of communities' and 'Modularity'.
+    '''
+    if corr.shape[0] != len(groups):
+        raise ValueError('The groups list does not have the same number of nodes as those present in the correlation matrix')
+        
+    corrnorm = normalize_corr(corr)
+    n = corrnorm.shape[0]
+    #Number of groups
+    groupset = list(set(groups))
+    ng = len(groupset)
+    
+    #nodes and group assignment
+    ind = list(range(0,n))
+    d1=dict(zip_longest(ind,groups))
+    
+    #where we will store all dataframes from eachgroup
+    data_dict = {}
+    
+    for group in list(range(0,ng)):
+        
+        #Modify different network
+        Gp = build_network(corrnorm)
+        
+        #Counter 
+        j = 0
+        
+        #cumulative counter
+        nr_cum = 0
+        
+        #Nodes to remove by group
+        nod_list = [kv[0] for kv in d1.items() if kv[1] == groupset[group]]
+        
+        #nodes to remove
+        n = len(nod_list)
+        nr = int(prem*n)
+        if nr <= 0:
+            nr = 1
+        #Data to store results per group
+        df = pd.DataFrame(columns = ['Nodes removed','Network density','Average degree', 'Number of components', 'Size of giant component','Fraction of giant component', 'Number of communities', 'Modularity'])
+
+        #Loop
+        while len(nod_list)>=nr:   
+            
+            # Choose nodes
+            nod_rem = sample(nod_list,nr) 
+
+            #Nodes removed so far
+            nr_cum = nr_cum + nr
+            
+            #Remove nodes from network
+            Gp.remove_nodes_from(nod_rem)
+            
+            
+            #Calculate metrics and store them
+            x = []
+            
+            # 1- Nodes removed
+            x.append(nr_cum)
+            # 2- netowrk density
+            x.append(nx.density(Gp))
+            # 3- average degree
+            x.append(np.mean([Gp.degree(n) for n in Gp.nodes()]))
+            # Number of  components
+            x.append(nx.number_connected_components(Gp))
+            # Calculat size of largest component
+            components = nx.connected_components(Gp)
+            x.append(len(max(components, key=len)))
+            #Fractions of nodes belonging to the giant component
+            x.append(x[4]/nx.number_of_nodes(Gp))
+            # Calculate comminuties
+            com = community.best_partition(Gp)
+            x.append(len(set(com.values())))
+            #Modularity
+            try: 
+                x.append(nx_comm.modularity(Gp, nx_comm.greedy_modularity_communities(Gp)))
+            except ZeroDivisionError:
+                x.append('nan')
+            
+            #append current iteration to data
+            df.loc[j] = x 
+            
+            #Node list from current network
+            for elem in nod_rem:
+                nod_list.remove(elem)
+                    
+            #Update counter 
+            j = j + 1
+            
+        data_name = 'Percolation_group_'+groupset[group]
+        
+        data_dict[data_name] = df
+        
+    return data_dict
