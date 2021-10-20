@@ -36,7 +36,7 @@ Compositional data cannot be processed or worked like normal data, it has partic
  ](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002687) to improve the ability to process large samples of data. Part of the stages were parallelized and the execution of the algorithm and its statistical tests were better controlled. To run this on your local please refer to the README.md in the sparcc folder.
 
 
-### [Network Algorithms](SNA/README.md)
+### [Network Algorithms](network_alg/README.md)
 
 Network analyses were used to characterise both the overall structure and the local interactions of the microbial network, in which each OTU was represented as a node and the correlations found by SparCC as undirected weighted edges, such that an edge between two nodes implies a relationship between the two corresponding OTUs. Given that most network analyses can only handle positive interactions, we normalized the SparCC correlation matrix from -1 to 1 to a range from 0 to 1, except for the structural balance analysis which directly uses the positive and negative correlation values. The dashboard includes the calculation of large scale metrics of the network, structural balance analysis and community/HDBSCAN subnetwork analysis. To run percolation analysis and topology comparison please refer to the README.md in the network_alg folder.
 
