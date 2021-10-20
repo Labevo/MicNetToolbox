@@ -1,7 +1,7 @@
 [![GitHub license](https://img.shields.io/github/license/hamelsmu/code_search.svg)]()
 [![Python 3.9.6](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-396/)
 
-# *MicNet Toolbox: Deconstructing a microbial interaction network* 
+# *MicNet Toolbox: visualizing and deconstructing a microbial network* 
 
 ## Introduction
 
@@ -46,6 +46,7 @@ Network analyses were used to characterise both the overall structure and the lo
 To configure the environment, you must first have the *conda* package manager installed. If you do not have it installed, we recommend that you install the miniconda or anaconda packages. You can find the instructions to install it at this link:
 
 [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
+
 [Anaconda](https://www.anaconda.com/)
 
 The first step to run the dashboard locally you need to create the environment, thus, first you must run the following code in the command line situating yourself firt in the folder of this repository.
