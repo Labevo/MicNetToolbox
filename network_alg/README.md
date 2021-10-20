@@ -12,7 +12,7 @@ The other analyses presented in Favila, Madrigal-Trejo et al. (in revision) are 
 
 To import the module locate yourself in the MicNetToolbox folder and run the following code:
 
-~~~bash
+~~~python
 import network_alg
 ~~~
 
