@@ -622,7 +622,7 @@ def topology_boostrap(corr:np.ndarray, n_boot:int= 100)->Tuple[pd.DataFrame,pd.D
     
     #Real network values
     assert corr.shape[0]==corr.shape[1],'It must be a square matrix'
-
+    corr = corr.fillna(0)
     corrnorm = _normalize_corr(corr)
     G = _build_network(corrnorm)
     n = G.number_of_nodes()
@@ -743,6 +743,8 @@ def degree_comparison(corr:np.ndarray, topology:str = 'random', bins:int = 20)->
         
     '''
     #Real network values
+    
+    corr = corr.fillna(0)
     corrnorm = _normalize_corr(corr)
     G = _build_network(corrnorm)
     n = G.number_of_nodes()
@@ -820,7 +822,7 @@ def percolation_sim(corr, prem = 0.1, per_type = 'random'):
         'Number of components', 'Size of giant component','Fraction of giant component', 
         'Number of communities' and 'Modularity'.
     '''
-
+    corr = corr.fillna(0)
     corrnorm = normalize_corr(corr)
     Gp = build_network(corrnorm)
     # Nodes to remove each iteration
@@ -933,7 +935,7 @@ def percolation_by_group(corr, prem = 0.1, groups = list()):
     '''
     if corr.shape[0] != len(groups):
         raise ValueError('The groups list does not have the same number of nodes as those present in the correlation matrix')
-        
+    corr = corr.fillna(0)
     corrnorm = normalize_corr(corr)
     n = corrnorm.shape[0]
     #Number of groups
