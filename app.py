@@ -382,7 +382,7 @@ def network_app():
 
         st.text('Outliers have a value of -1')
 
-        SparrDF=pd.DataFrame({'OTUS':Centrality['NUM_OTUS'],
+        SparrDF=pd.DataFrame({'OTUS':Centrality['NUM_OTUS'],'ASV':sparcc_corr.index,
                       'Degree_Centrality':Centrality['Degree centrality'],
                       'Betweeness_Centrality':Centrality['Betweeness centrality'],
                       'Closeness_Centrality':Centrality['Closeness centrality'],
@@ -402,7 +402,7 @@ def network_app():
         st.markdown('---')
         st.markdown("## HDBSCAN clusters information")
         with st.spinner("In progress"):
-            Clusters=NetM.HDBSCAN_subnetwork(sparcc_corr, HD.iloc[:,1])
+            Clusters=NetM.HDBSCAN_subnetwork(sparcc_corr, HD.Cluster)
         
         st.write(f'Number of clusters: {Clusters["Number of clusters"]}')
         st.table(Clusters["Clusters_topology"].T)
