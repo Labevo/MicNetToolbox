@@ -13,6 +13,58 @@ from random import sample
 from typing import Tuple, Union,Dict,Any,List
 
 
+
+
+def normalize_corr(corr:Union[np.ndarray,pd.DataFrame]):
+    '''
+    Function that takes the interaction matrix from Sparcc and normalizes its
+    values to range from 0 to 1. Any value that was 0 before is left as 0.
+    
+    Parameters
+    ----------
+    corr : correlation matrix read as a pandas DataFrame
+
+    Returns
+    -------
+    corr : pandas DataFrame with normalized correlations
+    '''
+
+    if type(corr)==pd.DataFrame:
+        corr=corr.values
+
+
+    max_val = corr.max().max()
+    min_val = corr.min().min()
+    corrnorm = (corr - min_val) / (max_val - min_val)
+    corrnorm = np.round(corrnorm, 3)
+    # leave 0s as zeros
+    corrnorm=np.where(corr==0,0,corrnorm)
+    
+    return corrnorm
+
+
+def build_network(corr:Union[np.ndarray,pd.DataFrame]):
+    '''
+    Function that takes the interaction matrix (as pandas Dataframe or numpy matrix) from Sparcc and returns the 
+    corresponding networkx graph
+    
+    Parameters
+    ----------
+    corr : correlation matrix read as a pandas DataFrame or numpy matrix
+
+    Returns
+    -------
+    G : netowrkx graph
+    '''
+    if type(corr)==pd.DataFrame:
+        corr=corr.values
+
+
+    #corr = np.matrix(corr)
+    G = nx.from_numpy_matrix(corr)
+    return G
+
+
 def get_weight(graph:nx.Graph):
     weights=np.asarray(list(nx.get_edge_attributes(graph, 'weight').values()))
     return weights
@@ -57,6 +109,12 @@ def small_world_index(G:nx.Graph,
 
         #Obtain clustering coefficients
         cc_rand = nx.average_clustering(G_rand)
+
+        #Check if network is connected
+        if nx.is_connected(G_rand):
+            pass
+        else:
+            G_rand=G_rand.subgraph(max(nx.connected_components(G_rand), key=len))
 
         #Obtain shortest path
         l_rand =  nx.average_shortest_path_length(G_rand)
@@ -118,6 +176,7 @@ class NetWork_MicNet:
         self.description['components']=nx.number_connected_components(graph)
         self.description['average_clustering']=nx.average_clustering(graph)
         self.description['modularity']=mod
+        
         if nx.is_connected(graph):
             pass
         else:
@@ -599,10 +658,14 @@ def topology_boostrap(corr:np.ndarray, n_boot:int= 100)->Tuple[pd.DataFrame,pd.D
             mod = 'nan'
     
         #Save metrics RANDOM
-        l=nx.average_shortest_path_length(G)
         cc=nx.average_clustering(G)
         n=G.number_of_nodes()
         p = nx.density(G)
+        if nx.is_connected(G):
+            pass
+        else:
+            G=G.subgraph(max(nx.connected_components(G), key=len))
+        l=nx.average_shortest_path_length(G)
 
         df_rand.loc[i]= [mod,l,cc,np.std([G.degree(n) for n in G.nodes()]),
                          small_world_index(G,n=n,p=p,cc=cc,l=l,n_iter=30)]
@@ -619,10 +682,15 @@ def topology_boostrap(corr:np.ndarray, n_boot:int= 100)->Tuple[pd.DataFrame,pd.D
             mod = 'nan'
             
         #Save metrics SMALL-WORLD
-        l=nx.average_shortest_path_length(Gsm)
         cc=nx.average_clustering(Gsm)
         n=Gsm.number_of_nodes()
         p = nx.density(Gsm)
+        if nx.is_connected(Gsm):
+            pass
+        else:
+            Gsm=Gsm.subgraph(max(nx.connected_components(Gsm), key=len))
+        l=nx.average_shortest_path_length(Gsm)
+
 
         df_small.loc[i]= [mod,l,cc,np.std([Gsm.degree(n) for n in Gsm.nodes()]),
                          small_world_index(Gsm,n=n,p=p,cc=cc,l=l,n_iter=30)]
@@ -640,10 +708,15 @@ def topology_boostrap(corr:np.ndarray, n_boot:int= 100)->Tuple[pd.DataFrame,pd.D
             mod = 'nan'
             
         #Save metrics SCALE-FREE
-        l=nx.average_shortest_path_length(Gsc)
         cc=nx.average_clustering(Gsc)
         n=Gsc.number_of_nodes()
         p = nx.density(Gsc)
+        if nx.is_connected(Gsc):
+            pass
+        else:
+            Gsc=Gsc.subgraph(max(nx.connected_components(Gsc), key=len))
+        l=nx.average_shortest_path_length(Gsc)
+
 
         df_scale.loc[i]= [mod,l,cc,np.std([Gsc.degree(n) for n in Gsc.nodes()]),
                          small_world_index(Gsc,n=n,p=p,cc=cc,l=l,n_iter = 30)]
@@ -717,10 +790,10 @@ def degree_comparison(corr:np.ndarray, topology:str = 'random', bins:int = 20)->
 
         
     df = pd.DataFrame()
-    df['Data_bins'] = bins_count[1:]
-    df['Data_CCDF'] = ccdf
-    df['Simulated_bins'] = bins_countR[1:]
-    df['Simulated_CCDF'] = ccdfR
+    df['Data_bins'] = np.log(bins_count[1:bins])
+    df['Data_CCDF'] = np.log(ccdf[0:bins-1])
+    df['Simulated_bins'] = np.log(bins_countR[1:bins])
+    df['Simulated_CCDF'] = np.log(ccdfR[0:bins-1])
     
     return df
 
