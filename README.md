@@ -81,7 +81,9 @@ The application will open in your browser at the port: http://localhost:8501
 
 ## Data Details
 
-As validation data, we use the Kombucha data set described in [Arikan et al., (2020)](https://onlinelibrary.wiley.com/doi/full/10.1111/1750-3841.14992). The data  "kombucha_raw_data.txt" can be downloaded from the repository and used to explore the usage of the dashboard.
+As validation data, we use the Kombucha data set described in [Arikan et al., (2020)](https://onlinelibrary.wiley.com/doi/full/10.1111/1750-3841.14992). .All data can be find in the folder named "Data". The "Kombucha_abundance_table.txt" can be used as input to run the UMAP/HDBSCAN and SparCC modules. We have also included the co-occurence matrix ("Kombucha_Sparcc_matrix.csv") and the HDBSCAN output file ("Kombucha_HDBSCAN.csv") which can be used as input to test the network module. The kombucha example can be easily inspected using the web dashboard at http://micnetapplb-1212130533.us-east-1.elb.amazonaws.com.
+
+As a case study we used the Domos Archean data set described in [Espinosa-Asuar et al. 2021](https://www.biorxiv.org/content/10.1101/2021.03.04.433984v1.full), a database with more than 2,000 OTUs. All data can be find in the folder named "Data". The "Domos_abundance_table.txt" can be use as input for the UMAP/HDBSCAN and Sparcc modules. We have also provided the co-ocurrence matrix in the file "Domos_Sparcc_matrix.csv" and the HDBSCAN output file ("Domos_HDBSCAN.csv") which can be input to test the network module. Given the size of the Domos dataset, to run this example you should run the dashboard locally in your computer, it cannot be run in the web version.
 
 ## Licenses
 [MIT License](LICENSE).
