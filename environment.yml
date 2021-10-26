@@ -17,7 +17,7 @@ dependencies:
   - python=3.8
   - scipy
   - spacy
-  - hdbscan
+  - hdbscan == 0.8.27
   
   - pip:
     - pyarrow
@@ -25,6 +25,6 @@ dependencies:
     - pytest
     - networkx
     - ipython
-    - umap-learn
+    - umap-learn == 0.5.1
     - python-louvain
     
