@@ -27,6 +27,5 @@ dependencies:
     - networkx
     - ipython
     - umap-learn
-    - scikit-bio
     - python-louvain
     
