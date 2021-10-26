@@ -88,7 +88,7 @@ def menu_app():
             Large-scale metrics, structural balance and community information can be calculated for the network, this section uses as input the Sparcc output.
 
         **Note**:
-            This dashobard runs in a virtual machine with limited capacity (2 CPUs and 6 GB of RAM), for large dataset please download our [repository](https://github.com/Labevo/MicNetToolbox) and run locally.
+            This dashobard runs in a virtual machine with limited capacity (2 CPUs and 6 GB of RAM), for large datasets please download our [repository](https://github.com/Labevo/MicNetToolbox) and run locally.
 
         """)
 
