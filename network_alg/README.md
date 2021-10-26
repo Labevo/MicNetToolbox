@@ -1,5 +1,5 @@
 
-# *Network analysis of co-ocrrence network obtained from SparCC* 
+# *Network analysis of co-ocurrence network obtained from SparCC* 
 
 ## Introduction
 
