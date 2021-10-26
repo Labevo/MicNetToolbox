@@ -6,16 +6,17 @@ channels:
 
 dependencies:
   - bokeh==2.2.2
+  - scikit-learn == 1.0.1
   - dask
   - h5py
   - hdf5
   - matplotlib-base
-  - numba
+  - numba == 0.54.1
   - pandas
   - pip 
   - pylint
   - python=3.8
-  - scipy
+  - scipy == 1.7.1
   - spacy
   - hdbscan == 0.8.27
   
