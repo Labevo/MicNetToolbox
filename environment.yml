@@ -9,7 +9,6 @@ dependencies:
   - dask
   - h5py
   - hdf5
-  - hdbscan
   - matplotlib-base
   - numba
   - pandas
