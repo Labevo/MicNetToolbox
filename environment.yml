@@ -6,7 +6,6 @@ channels:
 
 dependencies:
   - bokeh==2.2.2
-  - scikit-learn == 1.0.1
   - dask
   - h5py
   - hdf5
@@ -15,8 +14,7 @@ dependencies:
   - pandas
   - pip 
   - pylint
-  - python=3.8
-  - scipy == 1.7.1
+  - python=3.9
   - spacy
   - hdbscan == 0.8.27
   
@@ -24,8 +22,11 @@ dependencies:
     - pyarrow
     - streamlit == 0.88.0
     - pytest
-    - networkx
+    - networkx == 2.6.3
     - ipython
+    - numpy == 1.20.3
+    - scikit-learn == 1.0.1
+    - scipy == 1.7.1
     - umap-learn == 0.5.1
     - python-louvain
     
