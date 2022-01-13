@@ -165,6 +165,9 @@ def sparcc_app():
         DF_Output.index=SparCC_MN._Index_col
         DF_Output.columns=SparCC_MN._Index_col
 
+        #Fill NaN with zeros
+        DF_Output = DF_Output.fillna(0)
+
         csv = convert_df(DF_Output)
 
         st.download_button(label="Download correlation file",
