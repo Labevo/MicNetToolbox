@@ -37,9 +37,9 @@ from network_alg import plot_bokeh
 key='1e629b5c8f2e7fff85ed133a8713d545678bd44badac98200cbd156d'
 
 NORMALIZATION=['none','clr','standar','dirichlet']
-METRIC=['euclidean','manhattan','canberra','braycurtis','mahalanobis',
+METRIC=['euclidean','manhattan','canberra','braycurtis',
 'cosine','correlation','hellinger']
-METRIC_HDB=['euclidean','manhattan','canberra','braycurtis','mahalanobis']
+METRIC_HDB=['euclidean','manhattan','canberra','braycurtis']
 
 
 
