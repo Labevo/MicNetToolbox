@@ -95,7 +95,7 @@ def menu_app():
 
 def sparcc_app():
     st.sidebar.header("File")
-    file_input=st.sidebar.file_uploader("Upload file",type=["csv","txt"])
+    file_input=st.sidebar.file_uploader("Upload abundance table",type=["csv","txt"])
     low_abundance=st.sidebar.selectbox('Filter low abudance',options=[True, False],index=1,
                                 help='Do you want to filter low abundace (<5) OTUs?')
 
