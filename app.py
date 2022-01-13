@@ -16,7 +16,7 @@ import pandas as pd
 import numpy as np 
 import matplotlib as mpl
 import streamlit as st 
-from utils import kind_file, filter_otus
+from utils import kind_file, filter_otus, get_colour_name
 from umap_hdbscan import Embedding_Output 
 
 from sparcc import SparCC_MicNet
@@ -198,7 +198,7 @@ def dashboar_app():
                                    value=0.1,help='Check UMAP documentation')
     n_components=st.sidebar.slider(label='n_components',min_value=2,max_value=3,step=1,
                                        value=2,help='Check UMAP documentation')
-    metric_umap=st.sidebar.selectbox('Select metric',options=METRIC,index=7,
+    metric_umap=st.sidebar.selectbox('Select metric',options=METRIC,index=6,
                                         help='Check UMAP documentation')
     st.sidebar.markdown('---')
     st.sidebar.header('HDBSCAN parameters')
@@ -264,6 +264,11 @@ def dashboar_app():
             colors = ["#%02x%02x%02x" % (int(r), int(g), int(b)) \
             for r, g, b, _ in 255*mpl.cm.viridis(mpl.colors.Normalize()(l))]
             
+            colors2  = [(int(r), int(g), int(b)) \
+            for r, g, b, _ in 255*mpl.cm.viridis(mpl.colors.Normalize()(l))]
+
+            tempd = dict(zip(l, colors2))
+
             TOOLS="hover,crosshair,pan,wheel_zoom,zoom_in,zoom_out,box_zoom,undo,redo,reset,tap,save,box_select,poly_select,lasso_select,"
             
             if taxa:
@@ -285,11 +290,11 @@ def dashboar_app():
             st.markdown("---")
             st.markdown(f"""
             ## Description:
-               There is a total of {len(disk_x)} registers in the file. Where we found:
-                
-                * Number of clusters:  {len(set(l))}
+               There is a total of {len(disk_x)} registers in the file, of which {sum([otu == -1 for otu in l])} were considered noise ({get_colour_name(tempd[-1])} in the plot) but we found:
+
+                * Number of clusters:  {len(set(l))-1}
                 * Number of outliers:  {np.sum(o)}""")
-            
+    
 
 
         #if name_file is not None:
