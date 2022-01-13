@@ -20,6 +20,7 @@ dependencies:
   
   - pip:
     - pyarrow
+    - webcolors
     - streamlit == 0.88.0
     - pytest
     - networkx == 2.6.3
