@@ -25,7 +25,7 @@ The project is divided into three parts:
 
 **Note:** Each package has a REAME.md file with a specific description of how the code works. 
 
-![alt text](images/logo_ie.png)
+![alt text](images/Micnet_data.png)
 
 ### [Visualization](https://umap-learn.readthedocs.io/en/latest/clustering.html)
 
