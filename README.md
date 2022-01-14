@@ -29,7 +29,7 @@ Compositional data cannot be processed or worked like normal data, it has partic
 
 **Note:** Each package has a REAME.md file with a specific description of how the code works. 
 
-### [SparCC](sparc/README.md)
+### [SparCC](sparcc/README.md)
  
  This algorithm is standard for estimating correlation values from compositional data, in order to infer the network's connections. We made several modifications to the 
  [original version of the algorithm
