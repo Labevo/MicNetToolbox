@@ -23,13 +23,13 @@ The project is divided into three parts:
 * Network Algorithms
 
 
-### [Visualization](Visualization/README.md)
+### [Visualization](https://umap-learn.readthedocs.io/en/latest/clustering.html)
 
 Compositional data cannot be processed or worked like normal data, it has particular geometric and statistical properties. Using different transformations (Dirichlet transformation, Normalization or CLR) and the original data we estimate a mapping through the UMAP algorithm to the Hyperbolic Space. This to have a visualization of the data and its possible interactions. Furthermore, through the HDBSCAN algorithm we detect clusters based on density and which points are possible outliers and noise.
 
 **Note:** Each package has a REAME.md file with a specific description of how the code works. 
 
-### [SparCC](SparCC/README.md)
+### [SparCC](sparc/README.md)
  
  This algorithm is standard for estimating correlation values from compositional data, in order to infer the network's connections. We made several modifications to the 
  [original version of the algorithm
@@ -47,7 +47,7 @@ To configure the environment, you must first have the *conda* package manager in
 
 [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
-[Anaconda](https://www.anaconda.com/)
+[Anaconda](https://www.anaconda.com/products/individual)
 
 The first step to run the dashboard locally you need to create the environment, thus, first you must run the following code in the command line situating yourself firt in the folder of this repository.
 
@@ -75,7 +75,7 @@ Finally, to use the dashboard locally, be sure to be situated in the repository 
 streamlit run app.py
 
 ~~~
-The application will open in your browser at the port: http://localhost:8501 
+The application will open in your browser at the port: localhost:8501
 
 **Note: note: remember to activate the MicNet-env environment first**
 
