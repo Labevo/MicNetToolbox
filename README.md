@@ -7,6 +7,8 @@
 
 This project contains a set of tools to detect, analyze and visualize microbial interaction networks from compositional data. The main objective was to implement different tools of the different algorithms to reconstruct, analyze and visualize a co-ocurrence network with microbial interactions. For that, we use standard algorithms for compositional data processing (SparCC), Network or Graphics Algorithms and Umap Algorithms.
 
+![alt text](images/Micnet_data.jpg "Title")
+
 This project is part of the collaborative research between Ixulabs and the Laboratory of Experimental and Molecular Evolution, Institute of Ecology, UNAM.
 
 * [Laboratory of Experimental and Molecular Evolution, Instituto de Ecología, UNAM](http://web2.ecologia.unam.mx/perfiles/perfil.php?ID=1237852985093)
@@ -22,12 +24,12 @@ The project is divided into three parts:
 * SparCC
 * Network Algorithms
 
+**Note:** Each package has a REAME.md file with a specific description of how the code works. 
 
 ### [Visualization](https://umap-learn.readthedocs.io/en/latest/clustering.html)
 
 Compositional data cannot be processed or worked like normal data, it has particular geometric and statistical properties. Using different transformations (Dirichlet transformation, Normalization or CLR) and the original data we estimate a mapping through the UMAP algorithm to the Hyperbolic Space. This to have a visualization of the data and its possible interactions. Furthermore, through the HDBSCAN algorithm we detect clusters based on density and which points are possible outliers and noise.
 
-**Note:** Each package has a REAME.md file with a specific description of how the code works. 
 
 ### [SparCC](sparcc/README.md)
  
