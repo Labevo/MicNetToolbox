@@ -29,7 +29,7 @@ The project is divided into three parts:
 
 Compositional data cannot be processed or worked like normal data, it has particular geometric and statistical properties. Using different transformations (Dirichlet transformation, Normalization or CLR) and the original data we estimate a mapping through the UMAP algorithm to the Hyperbolic Space. This to have a visualization of the data and its possible interactions. Furthermore, through the HDBSCAN algorithm we detect clusters based on density and which points are possible outliers and noise.
 
-![alt text](images/Micnet_data.jpeg)
+<>![alt text](images/Micnet_data.jpeg)
 
 ### [SparCC](sparcc/README.md)
  
