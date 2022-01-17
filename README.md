@@ -45,8 +45,7 @@ If you do not wish to use the web app of MicNet which has limited capacity, and 
 
 [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
 
-[Anaconda](https://www.anaconda.com/products/indi
-vidual)
+[Anaconda](https://www.anaconda.com/products/individual)
 
 Once you have conda working on your computer the process is the following:
 
