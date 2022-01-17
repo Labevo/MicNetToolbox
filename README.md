@@ -29,21 +29,16 @@ The project is divided into three parts:
 
 Compositional data cannot be processed or worked like normal data, it has particular geometric and statistical properties. Using different transformations (Dirichlet transformation, Normalization or CLR) and the original data we estimate a mapping through the UMAP algorithm to the Hyperbolic Space. This to have a visualization of the data and its possible interactions. Furthermore, through the HDBSCAN algorithm we detect clusters based on density and which points are possible outliers and noise.
 
-<>![alt text](images/Micnet_data.jpeg)
-
 ### [SparCC](sparcc/README.md)
  
  This algorithm is standard for estimating correlation values from compositional data, in order to infer the network's connections. We made several modifications to the 
  [original version of the algorithm
  ](https://journals.plos.org/ploscompbiol/article?id=10.1371/journal.pcbi.1002687) to improve the ability to process large samples of data. Part of the stages were parallelized and the execution of the algorithm and its statistical tests were better controlled. To run this on your local please refer to the README.md in the sparcc folder.
 
-![alt text](images/Micnet_data.jpeg)
-
 ### [Network Algorithms](network_alg/README.md)
 
 Network analyses were used to characterise both the overall structure and the local interactions of the microbial network, in which each OTU was represented as a node and the correlations found by SparCC as undirected weighted edges, such that an edge between two nodes implies a relationship between the two corresponding OTUs. Given that most network analyses can only handle positive interactions, we normalized the SparCC correlation matrix from -1 to 1 to a range from 0 to 1, except for the structural balance analysis which directly uses the positive and negative correlation values. The dashboard includes the calculation of large scale metrics of the network, structural balance analysis and community/HDBSCAN subnetwork analysis. To run percolation analysis and topology comparison please refer to the README.md in the network_alg folder.
 
-![alt text](images/visualization.pdf)
 
 ## Dashboard Setup 
 
