@@ -54,13 +54,13 @@ Once you have conda working on your computer the process is the following:
 
     ~~~bash
     conda env create -f environment.yml 
-    ~~~bash
+    ~~~
 
     Be sure to check if the environment was created by typing in your command line the following:
 
     ~~~bash
     conda env list 
-    ~~~bash
+    ~~~
 
     You should see MicNet-env listed among your environments.
 
@@ -68,12 +68,13 @@ Once you have conda working on your computer the process is the following:
 
     ~~~bash
     conda activate  MicNet-env
-    ~~~bash
+    ~~~
 
 3. Finally, you just need to run the following code to get the web app running, NOTE that this app will be using your computer's computational resources (disk and RAM), thus giving you more power than the one we provide with free memory resources [here](http://micnetapplb-1212130533.us-east-1.elb.amazonaws.com). 
+    
     ~~~bash
     streamlit run app.py
-    ~~~bash
+    ~~~
 
     The application will open in your browser at the port: localhost:8501
 
