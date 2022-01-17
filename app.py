@@ -293,7 +293,7 @@ def dashboar_app():
             st.markdown("---")
             st.markdown(f"""
             ## Description:
-               There is a total of {len(disk_x)} registers in the file, of which {sum([otu == -1 for otu in l])} were considered noise ({get_colour_name(tempd[-1])} in the plot) but we found:
+               There is a total of {len(disk_x)} registers in the file, of which {sum([otu == -1 for otu in l])} were considered noise (signaled by -1 on the output file) and a total of:
 
                 * Number of clusters:  {len(set(l))-1}
                 * Number of outliers:  {np.sum(o)}""")
