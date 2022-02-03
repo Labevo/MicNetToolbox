@@ -83,15 +83,14 @@ Once you have conda working on your computer the process is the following:
 
 To use the micnet package you can install it via pip. However, you must first create the conda environment as described for the dashboard usage:
 
-    ```
+    
     streamlit run app.py
-    ```
+    
 
 Then you can install and use the micnet package:
 
-    ```
     pip install micnet
-    ```
+    
 
 ## Data Details
 
