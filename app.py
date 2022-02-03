@@ -36,12 +36,9 @@ from network_alg import plot_bokeh
 #CONTS
 key='1e629b5c8f2e7fff85ed133a8713d545678bd44badac98200cbd156d'
 
-NORMALIZATION=['none','clr','standar','dirichlet']
 METRIC=['euclidean','manhattan','canberra','braycurtis',
 'cosine','correlation','hellinger']
 METRIC_HDB=['euclidean','manhattan','canberra','braycurtis']
-
-
 
 PATH_IMAG=Path('images')
 OPTIONS=['Menu','UMAP/HDBSCAN','SparCC','Network']
@@ -182,10 +179,7 @@ def sparcc_app():
 def dashboar_app():
     st.sidebar.header("Interactive Visualizer")
 
-    #Parameters
-    type_normalization=st.sidebar.selectbox('Normalization type',NORMALIZATION,
-                                    help='Select which one to apply, by default normalizations are not applied.')
-        
+    #Parameters      
     file_input=st.sidebar.file_uploader(label='Input file',type=['txt','csv'],
                                             help='Upload the file to process')
     taxa=st.sidebar.selectbox('Include Taxa',options=[True, False],index=1,
@@ -436,9 +430,7 @@ def network_app():
                 file_name=name_file,
                 mime='text/csv',help='This file contains \
                 centralities and community information for each node')
-
-        
-
+     
 
 def core_app():
 
