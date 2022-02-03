@@ -25,6 +25,8 @@ The project is divided into three parts:
 
 **Note:** Each package has a REAME.md file with a specific description of how the code works. 
 
+You can use the free, but with limited capacity, [MicNet dashboard](http://micnetapplb-1212130533.us-east-1.elb.amazonaws.com)
+
 ### [Visualization](https://umap-learn.readthedocs.io/en/latest/clustering.html)
 
 Compositional data cannot be processed or worked like normal data, it has particular geometric and statistical properties. Using different transformations (Dirichlet transformation, Normalization or CLR) and the original data we estimate a mapping through the UMAP algorithm to the Hyperbolic Space. This to have a visualization of the data and its possible interactions. Furthermore, through the HDBSCAN algorithm we detect clusters based on density and which points are possible outliers and noise.
@@ -40,7 +42,7 @@ Compositional data cannot be processed or worked like normal data, it has partic
 Network analyses were used to characterise both the overall structure and the local interactions of the microbial network, in which each OTU was represented as a node and the correlations found by SparCC as undirected weighted edges, such that an edge between two nodes implies a relationship between the two corresponding OTUs. Given that most network analyses can only handle positive interactions, we normalized the SparCC correlation matrix from -1 to 1 to a range from 0 to 1, except for the structural balance analysis which directly uses the positive and negative correlation values. The dashboard includes the calculation of large scale metrics of the network, structural balance analysis and community/HDBSCAN subnetwork analysis. To run percolation analysis and topology comparison please refer to the README.md in the network_alg folder.
 
 
-## Local use
+## Local use of dashboard
 If you do not wish to use the web app of MicNet which has limited capacity, and you would prefer using **your own computer disk and RAM resources**, all you have to do is follow these steps. To do this, you must first have the *conda* package manager installed. If you do not have it installed, we recommend that you install the miniconda or anaconda packages. You can find the instructions to install it at this link:
 
 [Miniconda](https://docs.conda.io/en/latest/miniconda.html)
@@ -76,6 +78,20 @@ Once you have conda working on your computer the process is the following:
     ~~~
 
     The application will open in your browser at the port: localhost:8501
+
+## Installation of micnet package
+
+To use the micnet package you can install it via pip. However, you must first create the conda environment as described for the dashboard usage:
+
+    ~~~bash
+    conda env create -f environment.yml 
+    conda activate  MicNet-env
+    ~~~
+
+Then you can install and use the micnet package:
+    ~~~bash
+    pip install micnet
+    ~~~
 
 
 ## Data Details
